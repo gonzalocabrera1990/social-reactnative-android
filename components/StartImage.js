@@ -20,6 +20,9 @@ import { baseUrl } from '../shared/baseurl';
 // const mapDispatchToProps = dispatch => ({
 //   fetchUsersLikes: id => dispatch(fetchUsersLikes(id))
 // })
+const {width, height} = Dimensions.get('window');
+const ratio = width/541; //541 is actual image width
+
 export const StartImage = ({
   image,
   myUserId,
@@ -105,7 +108,8 @@ export const StartImage = ({
       </View>
       <View style={styles.imageContent}>
         <Image
-          width={Dimensions.get('window').width} // height will be calculated automatically
+          style={styles.imagina}
+          resizeMode={'contain'} // height will be calculated automatically
           source={{ uri: `${baseUrl}${image.imageId.filename}` }}
         />
 
@@ -165,7 +169,8 @@ export const StartImage = ({
               ) : null}
             </View>
 
-            {/* <View>
+            {
+            /* <View>
               {comments[0] === undefined ? null : comments[0] !== undefined &&
                 comments[0][1] !== undefined ? (
                 <View>
@@ -269,6 +274,12 @@ const styles = StyleSheet.create({
   padding: {
     padding: 8,
   },
+  imagina: {
+    flex: 1,
+        alignSelf: 'stretch',
+        width: width,
+        aspectRatio: 1
+},
   container: {
     display: 'flex',
     flexDirection: 'column',

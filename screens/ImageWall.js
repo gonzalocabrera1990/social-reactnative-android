@@ -97,7 +97,6 @@ const ImageWall = ({ route, navigation, user, users, commentsPost }) => {
     offset: 350 * index,
     index,
   });
-console.log(index)
   const ref = useRef(null);
   if (isLodaing || index < 0) {
     return (

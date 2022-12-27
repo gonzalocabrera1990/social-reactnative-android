@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 //import { Dimensions } from 'react-native';
 import { connect } from 'react-redux';
+import { Video } from 'expo-av'
 //import { fetchUsersLikes } from "../redux/ActionCreators";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -33,6 +34,9 @@ export const StartVideo = ({
   const [error, setError] = useState(null);
   const [ID, setId] = useState('');
 
+  let playContainer = React.createRef();
+
+  const [status, setStatus] = useState({});
   useEffect(() => {
     (async function () {
       let id = await AsyncStorage.getItem('id');
@@ -106,16 +110,22 @@ export const StartVideo = ({
         />
       </View>
       <View style={styles.imageContent}>
-        <Text>Video</Text>
-        {/* <Video
+        <TouchableOpacity style={status.isPlaying ? styles.iconPlay : {display: 'none'}} onPress={() =>
+          status.isPlaying ? playContainer.current.pauseAsync() : playContainer.current.playAsync()
+        }>
+          <MaterialCommunityIcons name="play" size={50} color="red" />
+        </TouchableOpacity>
+        <Video
+        ref={playContainer}
           source={{ uri: `${baseUrl}${image.videoId.filename}` }}
           key={image._id}
-          resizeMode="stretch"
+          resizeMode="contain"
           style={{
             aspectRatio: 1,
             width: '100%',
           }}
-        /> */}
+          onPlaybackStatusUpdate={status => setStatus(() => status)}
+        />
         {/* <VideoPlayer
     video={{ uri: `${baseUrl}${image.videoId.filename}` }}
     videoWidth={160}
@@ -332,6 +342,17 @@ const styles = StyleSheet.create({
     // alignItems: 'center',
     width: Dimensions.get('window').width,
     // minhHight: 980,
+  },
+  iconPlay: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    top:0,
+    right: 0,
+    left: 0,
+    bottom: 0,
+    zIndex:10
   },
   info: {
     display: 'flex',

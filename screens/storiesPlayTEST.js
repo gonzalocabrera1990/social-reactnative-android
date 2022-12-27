@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { Text, View, StyleSheet, Image, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
 //import { Keyframe } from 'react-native-reanimated';
 import { Video } from 'expo-av';
 import Constants from 'expo-constants';
@@ -29,8 +29,8 @@ const mapDispatchToProps = (dispatch) => ({
 
 const StoriesPlay = (props) => {
   const [userId, setUserId] = useState(null);
-  const [allDisplayStory, setAllDisplayStory] = useState([]);
-  const [currentDisplayStory, setCurrentDisplayStory] = useState([]);
+  const [allDisplayStory, setAllDisplayStory] = useState(null);
+  const [currentDisplayStory, setCurrentDisplayStory] = useState(null);
   const [indexDisplayStory, setIndexDisplayStory] = useState('');
   const [nextIndex, setNextIndex] = useState(0);
   const [indexTime, setIndexTime] = useState(0);
@@ -59,6 +59,7 @@ const StoriesPlay = (props) => {
     let fixCurrent = !allStories
       ? null
       : allStories.filter((h) => h[0].userData._id === id)[0];
+      console.log('fixCurrent', fixCurrent);
     setCurrentDisplayStory(fixCurrent);
     //get user index
     let currentIndex = !allStories
@@ -168,51 +169,44 @@ const StoriesPlay = (props) => {
       setNextIndex(nextIndex - 1);
     }
   };
-  const windowst = !allDisplayStory
-    ? null
-    : allDisplayStory.map((w, index) => {
-        //"let view" activar cuando este todo listo. es para saber si esta vista
-        //la story y asi activar la peticion para marcar como vista
-        // let view = allDisplayStory[indexDisplayStory][nextIndex].views.some(
-        //   (v) => v === userId
-        //);
- if(index == indexDisplayStory){
- console.log(w[nextIndex]._id);
-        let ext =
-          allDisplayStory[indexDisplayStory][nextIndex].filename.split('.');
-        return (
-          <React.Fragment key={w[nextIndex]._id} >
-            
-              <View style={styles.container} >
-                <View style={styles.imageContent} >
-                  <View style={styles.setIndex} >
-                    {!w
-                      ? null
-                      : w.map((i, it) => {
-                          return (
-                            <React.Fragment >
-                              {it === nextIndex ? (
-                                <View style={styles.setItems} key={i._id}>
-                                  <View
-                                    style={styles.timeFill}
-                                    //exiting={timefilling.duration(1000)}
-                                    ></View>
-                                </View>
-                              ) : it > nextIndex ? (
-                                <View style={styles.setItemsNoseen} key={i._id}>
-                                  <View></View>
-                                </View>
-                              ) : (
-                                <View style={styles.setItem} key={i._id}>
-                                  <View></View>
-                                </View>
-                              )}
-                            </React.Fragment>
-                          );
-                        })}
-                  </View>
+  if(currentDisplayStory) {
+  let ext =currentDisplayStory ?
+  currentDisplayStory[nextIndex].filename.split('.'):null
+  return (
+    <React.Fragment >
+        <View style={styles.container}>
+          <View style={styles.imageContent} >
+            <View style={styles.setIndex} >
+              {!currentDisplayStory
+                ?
+                <View>
+                <ActivityIndicator size="large" color="#00ff00" />
+              </View>
+                : currentDisplayStory.map((i, it) => {
+                    return (
+                      <React.Fragment >
+                        {it === nextIndex ? (
+                          <View style={styles.setItems} key={i._id}>
+                            <View
+                              style={styles.timeFill}
+                              //exiting={timefilling.duration(1000)}
+                              ></View>
+                          </View>
+                        ) : it > nextIndex ? (
+                          <View style={styles.setItemsNoseen} key={i._id}>
+                            <View></View>
+                          </View>
+                        ) : (
+                          <View style={styles.setItem} key={i._id}>
+                            <View></View>
+                          </View>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
 
-                  <View style={styles.imageContent} >
+            </View>
+            <View style={styles.imageContent} >
                     {ext[ext.length - 1] === 'png' ||
                     ext[ext.length - 1] === 'jpg' ||
                     ext[ext.length - 1] === 'jpeg' ||
@@ -221,12 +215,12 @@ const StoriesPlay = (props) => {
                       <>
                       <Image
                         style={styles.img}
-                        source={{ uri: `${baseUrl}${w[nextIndex].filename}` }}
+                        source={{ uri: `${baseUrl}${currentDisplayStory[nextIndex].filename}` }}
                         onLoad={() =>
                           loadImage(
-                            nextIndex === w.length - 1,
-                            index,
-                            w[nextIndex]._id
+                            nextIndex === currentDisplayStory.length - 1,
+                            nextIndex,
+                            currentDisplayStory[nextIndex]._id
                           )
                         }
                       />
@@ -234,38 +228,12 @@ const StoriesPlay = (props) => {
                     ) : (
                       <>
                       <StoryVideo
-                      content={w}
+                      content={currentDisplayStory}
                       videoEnd={videoEnd}
                       nextIndex={nextIndex}
-                      index={index}
+                      index={nextIndex}
                       />
                     </>
-          //             <View style={styles.imageContent} >
-          //               <TouchableOpacity style={styles.iconPlay} onPress={() =>
-          //   status.isPlaying ? playContainer.current.pauseAsync() : playContainer.current.playAsync()
-          // }>
-          //               <MaterialCommunityIcons name="play" size={50} color="white" />
-          //               </TouchableOpacity>
-          //             <Video
-          //             ref={playContainer}
-          //               source={{ uri: `${baseUrl}${w[nextIndex].filename}` }}
-          //               key={w[nextIndex]._id}
-          //               resizeMode="contain"
-          //               style={{
-          //                 aspectRatio: 1,
-          //                 width: '100%',
-          //               }}
-          //               onEnded={() =>
-          //                 videoEnd(
-          //                   nextIndex === w.length - 1,
-          //                   index,
-          //                   w[nextIndex]._id
-          //                 )
-          //               }
-          //               onPlaybackStatusUpdate={status => setStatus(() => status)}
-          //               //shouldPlay={true}
-          //             />
-          //             </View>
                     )}
                   </View>
                   <View style={styles.arrowCointainerLeft}>
@@ -284,17 +252,15 @@ const StoriesPlay = (props) => {
                         name="keyboard-arrow-right"
                         size={24}
                         color="black"
-                        onPress={() => forth(nextIndex === w.length - 1, index)}
+                        onPress={() => forth(nextIndex === currentDisplayStory.length - 1, index)}
                       />
                     </View>
                   </View>
-                </View>
-              </View>
-          </React.Fragment>
-        );
+            </View>
+            </View>
+        </React.Fragment>
+      )
                     }
-      });
-  return <View style={styles.container} >{windowst}</View>;
 };
 // const timefilling = new Keyframe({
 //   0: {
@@ -427,23 +393,6 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '0%',
     backgroundColor: 'black',
-    // animation-iteration-count: 1,
-    // animation-timing-function: linear,
-    // animation-fill-mode: forwards,
-  },
-  // arrow: {
-  //   textAlign: 'center',
-  //   color: 'grey',
-  //   fontSize: 30,
-  //   top: -1,
-  //   left: 4,
-  //   position: 'absolute',
-  // },
-  // paragraph: {
-  //   margin: 24,
-  //   fontSize: 18,
-  //   fontWeight: 'bold',
-  //   textAlign: 'center',
-  // },
+  }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(StoriesPlay);

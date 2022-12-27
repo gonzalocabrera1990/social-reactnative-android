@@ -242,7 +242,6 @@ export const Signup = ({ navigation, signup, signupUser }) => {
                   // defaultValueByIndex={1}
                   // defaultValue={'Egypt'}
                   onSelect={(selectedItem, index) => {
-                    console.log(selectedItem, index);
                     setDataForm((prevProps) => ({
                       ...prevProps,
                       gender: selectedItem,
@@ -290,7 +289,6 @@ export const Signup = ({ navigation, signup, signupUser }) => {
                   // defaultValueByIndex={1}
                   // defaultValue={'Egypt'}
                   onSelect={(selectedItem, index) => {
-                    console.log(selectedItem, index);
                     setDataForm((prevProps) => ({
                       ...prevProps,
                       country: selectedItem,

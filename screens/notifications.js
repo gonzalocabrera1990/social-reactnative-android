@@ -30,7 +30,6 @@ const Notifications = ({
   const [index, setIndex] = useState(null);
   useEffect(() => {
     setIndex(notifications.results);
-    console.log(notifications);
   }, [notifications]);
 
   useFocusEffect(

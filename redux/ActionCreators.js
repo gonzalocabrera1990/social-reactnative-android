@@ -430,6 +430,7 @@ export const fetchFollowing = () => async (dispatch) => {
           seen: filterMeasureSeenStory,
         },
       };
+      console.log(storyStore)
       return storyStore;
     })
     .then((list) => {

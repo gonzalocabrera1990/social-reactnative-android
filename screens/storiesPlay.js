@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Text, View, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
 //import { Keyframe } from 'react-native-reanimated';
 import { Video } from 'expo-av';
@@ -8,6 +8,7 @@ import { storiesView } from '../redux/ActionCreators';
 import { StoryVideo } from '../components/storyVideo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { useFocusEffect } from '@react-navigation/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { connect } from 'react-redux';
@@ -69,6 +70,18 @@ const StoriesPlay = (props) => {
     let getDuration = !fixCurrent ? null : fixCurrent[0].duration / 1000;
     setIndexTime(getDuration);
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        console.log('cccccc');
+        setIndexTime(null);
+        clearTimeout(timeImage);
+        setTimeImage(null)
+      };
+    }, [])
+  );
+
   let loadImage = (last, index, img) => {
     let gettime;
     clearTimeout(timeImage);
@@ -110,6 +123,7 @@ const StoriesPlay = (props) => {
   };
 
   let videoEnd = (last, index, img) => {
+    console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     let gettime;
     // if (!view)
     //   props

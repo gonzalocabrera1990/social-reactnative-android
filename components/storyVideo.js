@@ -31,15 +31,19 @@ export const StoryVideo = ({
             </TouchableOpacity>
             <Video
                 ref={playContainer}
-                source={{ uri: `${baseUrl}${content[nextIndex].filename}` }}
+                source={{ uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4' }}
                 style={{
                     aspectRatio: 1,
                     width: '100%',
                     backgroundColor:'red'
                   }}
                   resizeMode="contain"
-                  isLooping
-                  onPlaybackStatusUpdate={status => setStatus(() => status)}
+                  onPlaybackStatusUpdate={setStatus}
+                  onLoad={()=> setTimeout(() => {
+                    videoEnd(nextIndex === content.length - 1, index, content[nextIndex]._id)
+                  }, 10000)}
+                  shouldPlay={true}
+
             />
         </View>
     );

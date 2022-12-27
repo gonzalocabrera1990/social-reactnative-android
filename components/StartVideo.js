@@ -33,10 +33,10 @@ export const StartVideo = ({
   const [iLikeIt, setILikeIt] = useState('black');
   const [error, setError] = useState(null);
   const [ID, setId] = useState('');
-
-  let playContainer = React.createRef();
-
   const [status, setStatus] = useState({});
+  
+  let playVideo = React.createRef();
+
   useEffect(() => {
     (async function () {
       let id = await AsyncStorage.getItem('id');
@@ -110,21 +110,21 @@ export const StartVideo = ({
         />
       </View>
       <View style={styles.imageContent}>
-        <TouchableOpacity style={status.isPlaying ? styles.iconPlay : {display: 'none'}} onPress={() =>
-          status.isPlaying ? playContainer.current.pauseAsync() : playContainer.current.playAsync()
+        <TouchableOpacity style={status.isPlaying ? styles.iconPause : styles.iconPlay } onPress={() =>
+          status.isPlaying ? playVideo.current.pauseAsync() : playVideo.current.playAsync()
         }>
-          <MaterialCommunityIcons name="play" size={50} color="red" />
+          <MaterialCommunityIcons name="play" size={50} color={status.isPlaying ? 'transparent' : 'green'} />
         </TouchableOpacity>
         <Video
-        ref={playContainer}
-          source={{ uri: `${baseUrl}${image.videoId.filename}` }}
+        ref={playVideo}
+          source={{ uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4' }}
           key={image._id}
           resizeMode="contain"
           style={{
             aspectRatio: 1,
             width: '100%',
           }}
-          onPlaybackStatusUpdate={status => setStatus(() => status)}
+          onPlaybackStatusUpdate={setStatus}
         />
         {/* <VideoPlayer
     video={{ uri: `${baseUrl}${image.videoId.filename}` }}
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width,
     // minhHight: 980,
   },
-  iconPlay: {
+  iconPause: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -353,6 +353,18 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     zIndex:10
+  },
+  iconPlay: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    top:0,
+    right: 0,
+    left: 0,
+    bottom: 0,
+    zIndex:10,
+    color: 'transparent'
   },
   info: {
     display: 'flex',

@@ -17,6 +17,7 @@ import Notifications from '../screens/notifications';
 import StoriesPlay from '../screens/storiesPlay';
 import Settings from '../screens/settings';
 import { Start } from '../screens/start';
+// import { Animation } from '../components/animation';
 import Userpage from '../screens/userpage';
 import Users from '../screens/users';
 // import {
@@ -119,6 +120,11 @@ const MainStack = (props) => {
               tabBarStyle: { display: 'none' },
             }}
           />
+                    {/* <Stack.Screen
+            name="Animation"
+            component={Animation}
+           
+          /> */}
           <Stack.Screen
             name="RenderItemVid"
             component={RenderItemVid}

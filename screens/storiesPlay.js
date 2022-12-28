@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Text, View, StyleSheet, Image, Dimensions, TouchableOpacity } from 'react-native';
-//import { Keyframe } from 'react-native-reanimated';
+import Animated, { Keyframe, Easing } from 'react-native-reanimated';
 import { Video } from 'expo-av';
 import Constants from 'expo-constants';
 
@@ -36,13 +36,14 @@ const StoriesPlay = (props) => {
   const [nextIndex, setNextIndex] = useState(0);
   const [indexTime, setIndexTime] = useState(0);
   const [timeImage, setTimeImage] = useState(0);
-  
+
+  const { width } = Dimensions.get('window')
   useEffect(() => {
     (async function () {
       let idA = await AsyncStorage.getItem('id');
       setUserId(idA);
     })();
-  }, []);
+  }, [props.route.params]);
 
   useEffect(() => {
     let getStories = !props.stories ? null : props.stories; //get story props
@@ -69,15 +70,19 @@ const StoriesPlay = (props) => {
 
     let getDuration = !fixCurrent ? null : fixCurrent[0].duration / 1000;
     setIndexTime(getDuration);
-  }, []);
+  }, [props.route.params]);
 
   useFocusEffect(
     useCallback(() => {
       return () => {
-        console.log('cccccc');
         setIndexTime(null);
         clearTimeout(timeImage);
         setTimeImage(null)
+        setUserId(null);
+        setAllDisplayStory(timeImage);
+        setCurrentDisplayStory(null)
+        setIndexDisplayStory(null);
+        setNextIndex(timeImage);
       };
     }, [])
   );
@@ -182,57 +187,74 @@ const StoriesPlay = (props) => {
       setNextIndex(nextIndex - 1);
     }
   };
+
   const windowst = !allDisplayStory
     ? null
     : allDisplayStory.map((w, index) => {
-        //"let view" activar cuando este todo listo. es para saber si esta vista
-        //la story y asi activar la peticion para marcar como vista
-        // let view = allDisplayStory[indexDisplayStory][nextIndex].views.some(
-        //   (v) => v === userId
-        //);
- if(index == indexDisplayStory){
- console.log(w[nextIndex]._id);
+      //"let view" activar cuando este todo listo. es para saber si esta vista
+      //la story y asi activar la peticion para marcar como vista
+      // let view = allDisplayStory[indexDisplayStory][nextIndex].views.some(
+      //   (v) => v === userId
+      //);
+      const enteringAnimation = new Keyframe({
+        0: {
+          width: 0
+        },
+        100: {
+          width: (width / w.length) - 2,
+          easing: Easing.quad,
+        },
+      }).duration(10000);
+      if (index == indexDisplayStory) {
+        console.log(w[nextIndex]._id);
         let ext =
           allDisplayStory[indexDisplayStory][nextIndex].filename.split('.');
         return (
           <React.Fragment key={w[nextIndex]._id} >
-            
-              <View style={styles.container} >
-                <View style={styles.imageContent} >
-                  <View style={styles.setIndex} >
-                    {!w
-                      ? null
-                      : w.map((i, it) => {
-                          return (
-                            <React.Fragment >
-                              {it === nextIndex ? (
-                                <View style={styles.setItems} key={i._id}>
-                                  <View
-                                    style={styles.timeFill}
-                                    //exiting={timefilling.duration(1000)}
-                                    ></View>
-                                </View>
-                              ) : it > nextIndex ? (
-                                <View style={styles.setItemsNoseen} key={i._id}>
-                                  <View></View>
-                                </View>
-                              ) : (
-                                <View style={styles.setItem} key={i._id}>
-                                  <View></View>
-                                </View>
-                              )}
-                            </React.Fragment>
-                          );
-                        })}
-                  </View>
 
-                  <View style={styles.imageContent} >
-                    {ext[ext.length - 1] === 'png' ||
+            <View style={styles.container} >
+              <View style={styles.imageContent} >
+                <View style={styles.setIndex} >
+                  {!w
+                    ? null
+                    : w.map((i, it) => {
+                      return (
+                        <React.Fragment >
+                          {it === nextIndex ? (
+                            <View style={styles.setItems} key={i._id}>
+                              <Animated.View
+                                entering={enteringAnimation}
+                                style={{
+                                  height: '100%',
+                                  width: 0,
+                                  backgroundColor: 'black',
+                                  borderRadius: 5,
+                                  zIndex: 10,
+                                }}
+
+                              />
+                            </View>
+                          ) : it > nextIndex ? (
+                            <View style={styles.setItemsNoseen} key={i._id}>
+                              <View></View>
+                            </View>
+                          ) : (
+                            <View style={styles.setItem} key={i._id}>
+                              <View></View>
+                            </View>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                </View>
+
+                <View style={styles.imageContent} >
+                  {ext[ext.length - 1] === 'png' ||
                     ext[ext.length - 1] === 'jpg' ||
                     ext[ext.length - 1] === 'jpeg' ||
                     ext[ext.length - 1] === 'gif' ||
                     ext[ext.length - 1] === 'ico' ? (
-                      <>
+                    <>
                       <Image
                         style={styles.img}
                         source={{ uri: `${baseUrl}${w[nextIndex].filename}` }}
@@ -244,80 +266,73 @@ const StoriesPlay = (props) => {
                           )
                         }
                       />
-                      </>
-                    ) : (
-                      <>
+                    </>
+                  ) : (
+                    <>
                       <StoryVideo
-                      content={w}
-                      videoEnd={videoEnd}
-                      nextIndex={nextIndex}
-                      index={index}
+                        content={w}
+                        videoEnd={videoEnd}
+                        nextIndex={nextIndex}
+                        index={index}
                       />
                     </>
-          //             <View style={styles.imageContent} >
-          //               <TouchableOpacity style={styles.iconPlay} onPress={() =>
-          //   status.isPlaying ? playContainer.current.pauseAsync() : playContainer.current.playAsync()
-          // }>
-          //               <MaterialCommunityIcons name="play" size={50} color="white" />
-          //               </TouchableOpacity>
-          //             <Video
-          //             ref={playContainer}
-          //               source={{ uri: `${baseUrl}${w[nextIndex].filename}` }}
-          //               key={w[nextIndex]._id}
-          //               resizeMode="contain"
-          //               style={{
-          //                 aspectRatio: 1,
-          //                 width: '100%',
-          //               }}
-          //               onEnded={() =>
-          //                 videoEnd(
-          //                   nextIndex === w.length - 1,
-          //                   index,
-          //                   w[nextIndex]._id
-          //                 )
-          //               }
-          //               onPlaybackStatusUpdate={status => setStatus(() => status)}
-          //               //shouldPlay={true}
-          //             />
-          //             </View>
-                    )}
+                    //             <View style={styles.imageContent} >
+                    //               <TouchableOpacity style={styles.iconPlay} onPress={() =>
+                    //   status.isPlaying ? playContainer.current.pauseAsync() : playContainer.current.playAsync()
+                    // }>
+                    //               <MaterialCommunityIcons name="play" size={50} color="white" />
+                    //               </TouchableOpacity>
+                    //             <Video
+                    //             ref={playContainer}
+                    //               source={{ uri: `${baseUrl}${w[nextIndex].filename}` }}
+                    //               key={w[nextIndex]._id}
+                    //               resizeMode="contain"
+                    //               style={{
+                    //                 aspectRatio: 1,
+                    //                 width: '100%',
+                    //               }}
+                    //               onEnded={() =>
+                    //                 videoEnd(
+                    //                   nextIndex === w.length - 1,
+                    //                   index,
+                    //                   w[nextIndex]._id
+                    //                 )
+                    //               }
+                    //               onPlaybackStatusUpdate={status => setStatus(() => status)}
+                    //               //shouldPlay={true}
+                    //             />
+                    //             </View>
+                  )}
+                </View>
+                <View style={styles.arrowCointainerLeft}>
+                  <View style={styles.arrowLeft}>
+                    <MaterialIcons
+                      name="keyboard-arrow-left"
+                      size={24}
+                      color="black"
+                      onPress={() => back(nextIndex === 0, index)}
+                    />
                   </View>
-                  <View style={styles.arrowCointainerLeft}>
-                    <View style={styles.arrowLeft}>
-                      <MaterialIcons
-                        name="keyboard-arrow-left"
-                        size={24}
-                        color="black"
-                        onPress={() => back(nextIndex === 0, index)}
-                      />
-                    </View>
-                  </View>
-                  <View style={styles.arrowCointainerRight}>
-                    <View style={styles.arrowRight}>
-                      <MaterialIcons
-                        name="keyboard-arrow-right"
-                        size={24}
-                        color="black"
-                        onPress={() => forth(nextIndex === w.length - 1, index)}
-                      />
-                    </View>
+                </View>
+                <View style={styles.arrowCointainerRight}>
+                  <View style={styles.arrowRight}>
+                    <MaterialIcons
+                      name="keyboard-arrow-right"
+                      size={24}
+                      color="black"
+                      onPress={() => forth(nextIndex === w.length - 1, index)}
+                    />
                   </View>
                 </View>
               </View>
+            </View>
           </React.Fragment>
         );
-                    }
-      });
+      }
+    });
   return <View style={styles.container} >{windowst}</View>;
 };
-// const timefilling = new Keyframe({
-//   0: {
-//     width: '0%',
-//   },
-//   100: {
-//     width: '100%',
-//   },
-// });
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -345,12 +360,12 @@ const styles = StyleSheet.create({
     height: Dimensions.get('window').height,
     width: Dimensions.get('window').width,
   },
-  videoStory:{
+  videoStory: {
     width: Dimensions.get('window').width,
-    aspectRatio:1,
+    aspectRatio: 1,
     height: '100%'
   },
-  iconPlay:{
+  iconPlay: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -418,7 +433,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   setItemsNoseen: {
-    backgroundColor: 'black',
+    backgroundColor: 'green',
     opacity: 0.5,
     flexGrow: 1,
     height: 5,
@@ -441,6 +456,7 @@ const styles = StyleSheet.create({
     height: '100%',
     width: '0%',
     backgroundColor: 'black',
+    zIndex: 10
     // animation-iteration-count: 1,
     // animation-timing-function: linear,
     // animation-fill-mode: forwards,

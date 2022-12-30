@@ -204,9 +204,9 @@ const StoriesPlay = (props) => {
           width: (width / w.length) - 2,
           easing: Easing.quad,
         },
-      }).duration(10000);
+      }).duration(indexTime);
       if (index == indexDisplayStory) {
-        console.log(w[nextIndex]._id);
+        console.log(indexTime);
         let ext =
           allDisplayStory[indexDisplayStory][nextIndex].filename.split('.');
         return (
@@ -273,6 +273,7 @@ const StoriesPlay = (props) => {
                         content={w}
                         videoEnd={videoEnd}
                         nextIndex={nextIndex}
+                        indexTime={indexTime}
                         index={index}
                       />
                     </>

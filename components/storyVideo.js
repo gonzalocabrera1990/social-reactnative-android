@@ -18,6 +18,7 @@ export const StoryVideo = ({
     content,
     videoEnd,
     nextIndex,
+    indexTime,
     index}) => {
 
     const [status, setStatus] = useState({});
@@ -31,7 +32,7 @@ export const StoryVideo = ({
             </TouchableOpacity>
             <Video
                 ref={playContainer}
-                source={{ uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4' }}
+                source={{ uri: `${baseUrl}${content[nextIndex].filename}` }}
                 style={{
                     aspectRatio: 1,
                     width: '100%',
@@ -41,7 +42,7 @@ export const StoryVideo = ({
                   onPlaybackStatusUpdate={setStatus}
                   onLoad={()=> setTimeout(() => {
                     videoEnd(nextIndex === content.length - 1, index, content[nextIndex]._id)
-                  }, 10000)}
+                  }, indexTime)}
                   shouldPlay={true}
 
             />

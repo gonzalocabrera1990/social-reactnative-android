@@ -117,7 +117,7 @@ export const StartVideo = ({
         </TouchableOpacity>
         <Video
         ref={playVideo}
-          source={{ uri: 'http://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4' }}
+          source={{ uri: `${baseUrl}${image.videoId.filename}` }}
           key={image._id}
           resizeMode="contain"
           style={{

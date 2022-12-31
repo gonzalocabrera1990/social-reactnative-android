@@ -68,7 +68,8 @@ const StoriesPlay = (props) => {
       : allStories.findIndex((h) => h[0].userData._id === id);
     setIndexDisplayStory(currentIndex);
 
-    let getDuration = !fixCurrent ? null : fixCurrent[0].duration / 1000;
+    let getDuration = !fixCurrent ? null : fixCurrent[0].duration;
+    console.log("time", !fixCurrent ? null : fixCurrent[0].duration);
     setIndexTime(getDuration);
   }, [props.route.params]);
 
@@ -108,7 +109,7 @@ const StoriesPlay = (props) => {
       setTimeImage(
         setTimeout(() => {
           gettime =
-            allDisplayStory[indexDisplayStory + 1][0].duration / 1000;
+            allDisplayStory[indexDisplayStory + 1][0].duration;
           setNextIndex(0);
           setIndexTime(gettime);
           setIndexDisplayStory(indexDisplayStory + 1);
@@ -118,8 +119,7 @@ const StoriesPlay = (props) => {
       setTimeImage(
         setTimeout(() => {
           gettime =
-            allDisplayStory[indexDisplayStory][nextIndex + 1].duration /
-            1000;
+            allDisplayStory[indexDisplayStory][nextIndex + 1].duration;
           setIndexTime(gettime);
           setNextIndex(nextIndex + 1);
         }, 10000)
@@ -141,12 +141,12 @@ const StoriesPlay = (props) => {
       props.navigation.navigate('Home');
     } else if (last) {
       setNextIndex(0);
-      gettime = allDisplayStory[indexDisplayStory + 1][0].duration / 1000;
+      gettime = allDisplayStory[indexDisplayStory + 1][0].duration;
       setIndexTime(gettime);
       setIndexDisplayStory(indexDisplayStory + 1);
     } else {
       gettime =
-        allDisplayStory[indexDisplayStory][nextIndex + 1].duration / 1000;
+        allDisplayStory[indexDisplayStory][nextIndex + 1].duration;
       setIndexTime(gettime);
       setNextIndex(nextIndex + 1);
     }
@@ -158,13 +158,13 @@ const StoriesPlay = (props) => {
     if (last && changeUserIndex) {
       props.navigation.navigate('Home');
     } else if (last) {
-      gettime = allDisplayStory[indexDisplayStory + 1][0].duration / 1000;
+      gettime = allDisplayStory[indexDisplayStory + 1][0].duration;
       setNextIndex(0);
       setIndexTime(gettime);
       setIndexDisplayStory(indexDisplayStory + 1);
     } else {
       gettime =
-        allDisplayStory[indexDisplayStory][nextIndex + 1].duration / 1000;
+        allDisplayStory[indexDisplayStory][nextIndex + 1].duration;
       setIndexTime(gettime);
       setNextIndex(nextIndex + 1);
     }
@@ -176,13 +176,13 @@ const StoriesPlay = (props) => {
     if (first && changeUserIndex) {
       props.navigation.navigate('Home');
     } else if (first) {
-      gettime = allDisplayStory[indexDisplayStory - 1][0].duration / 1000;
+      gettime = allDisplayStory[indexDisplayStory - 1][0].duration;
       setNextIndex(0);
       setIndexTime(gettime);
       setIndexDisplayStory(indexDisplayStory - 1);
     } else {
       gettime =
-        allDisplayStory[indexDisplayStory][nextIndex - 1].duration / 1000;
+        allDisplayStory[indexDisplayStory][nextIndex - 1].duration;
       setIndexTime(gettime);
       setNextIndex(nextIndex - 1);
     }

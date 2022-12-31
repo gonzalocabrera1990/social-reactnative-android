@@ -6,10 +6,11 @@ import {
   Image,
   ScrollView,
   TouchableHighlight,
+  Dimensions
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-// import { Video } from 'expo-av';
+import { Video } from 'expo-av';
 import { useFocusEffect } from '@react-navigation/native';
 import Constants from 'expo-constants';
 
@@ -131,7 +132,7 @@ const Users = (props) => {
 
         const photosWall = u.imagesWall.map((img) => {
           return (
-            <View key={img._id} style={styles.imgRow}>
+            <View key={img._id} style={styles.imgWall}>
               <TouchableHighlight
                 onPress={() =>
                   props.navigation.navigate('ImageWall', {
@@ -152,7 +153,7 @@ const Users = (props) => {
         });
         const videosWall = u.videosWall.map((img) => {
           return (
-            <View key={img._id} style={styles.imgRow}>
+            <View key={img._id} style={styles.imgWall}>
               <TouchableHighlight
                 onPress={() =>
                   props.navigation.navigate('ImageWall', {
@@ -163,13 +164,15 @@ const Users = (props) => {
                     commentsPost: commentsPost,
                   })
                 }>
-                {/* <Video
-                  style={styles.vidWall}
-                  repeat={true}
-                  resizeMode="contain"
-                  source={{ uri: `${baseUrl}${img.filename}` }}
-                /> */}
-                <Text>Video</Text>
+                  <Video
+                source={{ uri: `${baseUrl}${img.filename}` }}
+                key={img._id}
+                resizeMode="cover"
+                style={{
+                  aspectRatio: 1,
+                  width: '100%',
+                }}
+              />
               </TouchableHighlight>
             </View>
           );
@@ -406,11 +409,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginVertical: 'auto',
-    //justifyContent: 'space-between',
+    width: Dimensions.get('window').width
   },
   imgWall: {
-    width: 105,
-    height: 105,
+    width: Dimensions.get('window').width / 3,
+    height: Dimensions.get('window').width / 3,
   },
   vidWall: {
     width: 105,

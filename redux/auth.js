@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // we would also want a util to check if the token is expired.
 export const Auth = (
   state = {
-    isLoading: false,
+    isLoading: true,
     isAuthenticated: AsyncStorage.getItem("token") ? true : false,
     token: AsyncStorage.getItem("token"),
     user: AsyncStorage.getItem("creds")
@@ -18,6 +18,16 @@ export const Auth = (
   action
 ) => {
   switch (action.type) {
+        case ActionTypes.TOKEN_LOADING:
+      return {
+        ...state,
+        isLoading: true
+      };
+      case ActionTypes.TOKEN_CHECK:
+      return {
+        ...state,
+        isLoading: false
+      };
     case ActionTypes.LOGIN_REQUEST:
       return {
         ...state,

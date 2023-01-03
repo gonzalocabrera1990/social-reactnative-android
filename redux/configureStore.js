@@ -13,6 +13,7 @@ import { Following } from './following';
 import { Imagen } from './imagen';
 import { Likes } from './likes';
 import { Stories } from './stories';
+
 import thunk from "redux-thunk";
 
 export const ConfigureStore = () => {
@@ -33,7 +34,7 @@ export const ConfigureStore = () => {
       likes: Likes,
       stories: Stories
     }),
-    applyMiddleware(thunk)
+applyMiddleware(thunk)
   );
 
   return store;

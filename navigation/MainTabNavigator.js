@@ -17,17 +17,12 @@ import Notifications from '../screens/notifications';
 import StoriesPlay from '../screens/storiesPlay';
 import Settings from '../screens/settings';
 import { Start } from '../screens/start';
-// import { Animation } from '../components/animation';
+import { Poster } from '../screens/poster';
 import Userpage from '../screens/userpage';
 import Users from '../screens/users';
-// import {
-//   fetchUser,
-//   logoutUser,
-//   fetchStart,
-//   fetchNotifications,
-//   fetchFollowers,
-//   fetchFollowing,
-// } from '../redux/ActionCreators';
+import {
+  checkToken
+} from '../redux/ActionCreators';
 
 // import AuthLoadingScreen from '../components/AuthLoadingScreen';
 import { connect } from 'react-redux';
@@ -35,35 +30,39 @@ import { connect } from 'react-redux';
 const mapStateToProps = (state) => {
   return {
     auth: state.auth,
-    user: state.user.user,
+    user: state.user,
   };
 };
-// const mapDispatchToProps = dispatch => ({
-// //   logoutUser: () => dispatch(logoutUser()),
-// //   fetchStart: () => dispatch(fetchStart()),
-// //   //fetchNotifications: () => dispatch(fetchNotifications()),
-// //   fetchFollowers: () => dispatch(fetchFollowers()),
-//    fetchUser: (id) => dispatch(fetchUser(id))
-// })
 
+const mapDispatchToProps = dispatch => ({
+  checkToken: () => dispatch(checkToken())
+})
 const Stack = createBottomTabNavigator();
 // const auth = this.props.auth.auth.isAuthenticated;
 // console.log("navbar", auth);
 const MainStack = (props) => {
   useEffect(() => {
+   
     async function payload() {
-      props.dispatch({
-        type: 'RELOAD_AUTH',
-        payload: {
-          isAuthenticated: await AsyncStorage.getItem('token'),
-          token: await AsyncStorage.getItem('token'),
-          user: await AsyncStorage.getItem('creds'),
-          id: await AsyncStorage.getItem('id'),
-        },
-      });
-    }
-    payload();
-  }, []);
+       const tokP = await AsyncStorage.getItem('token');
+       const userP = await AsyncStorage.getItem('creds');
+       const idP = await AsyncStorage.getItem('id');
+       const tok = JSON.parse(tokP);
+       const user = JSON.parse(userP);
+       const id = JSON.parse(idP);
+       props.dispatch({
+         type: 'RELOAD_AUTH',
+         payload: {
+           isAuthenticated: tok,
+           token: tok,
+           user: user,
+           id: id,
+         },
+       });
+     }
+     payload();
+     props.checkToken()
+   }, []);
 
   return (
     <Stack.Navigator
@@ -93,10 +92,45 @@ const MainStack = (props) => {
         headerShown: false,
       })}
     >
-      {props.auth.isAuthenticated ? (
+      {
+        props.auth.isLoading &&
+      props.user.isLoading ? (
+         <Stack.Screen
+            name="Poster"
+            component={Poster}
+            options={{
+              tabBarButton: () => null,
+              tabBarStyle: { display: 'none' },
+            }}
+          /> 
+        )
+      :
+        !props.auth.isAuthenticated ? 
+         
+      (
+        <>
+        <Stack.Screen
+          name="LogIn"
+          component={HomeScreen}
+          options={{
+            tabBarStyle: { display: 'none' },
+          }}
+        />
+          <Stack.Screen
+            name="Signup"
+            component={Signup}
+            options={{
+              tabBarButton: () => null,
+              tabBarStyle: { display: 'none' },
+            }}
+          />
+        </>
+      )
+        
+        :
+        (
         <>
           <Stack.Screen name="Home" component={Start} />
-
           <Stack.Screen name="Profile" component={Userpage} />
           <Stack.Screen
             options={{ tabBarBadge: 3 }}
@@ -113,6 +147,13 @@ const MainStack = (props) => {
             }}
           />
           <Stack.Screen
+            name="Settings"
+            component={Settings}
+            options={{
+              tabBarButton: () => null,
+            }}
+          />
+          <Stack.Screen
             name="RenderItem"
             component={RenderItem}
             options={{
@@ -120,11 +161,6 @@ const MainStack = (props) => {
               tabBarStyle: { display: 'none' },
             }}
           />
-                    {/* <Stack.Screen
-            name="Animation"
-            component={Animation}
-           
-          /> */}
           <Stack.Screen
             name="RenderItemVid"
             component={RenderItemVid}
@@ -134,16 +170,16 @@ const MainStack = (props) => {
             }}
           />
           <Stack.Screen
-            name="Messages"
-            component={Messages}
+            name="MsProfile"
+            component={MProfile}
             options={{
               tabBarButton: () => null,
               tabBarStyle: { display: 'none' },
             }}
           />
           <Stack.Screen
-            name="MsProfile"
-            component={MProfile}
+            name="Messages"
+            component={Messages}
             options={{
               tabBarButton: () => null,
               tabBarStyle: { display: 'none' },
@@ -173,13 +209,6 @@ const MainStack = (props) => {
             }}
           />
           <Stack.Screen
-            name="Settings"
-            component={Settings}
-            options={{
-              tabBarButton: () => null,
-            }}
-          />
-           <Stack.Screen
             name="StoriesPlay"
             component={StoriesPlay}
             options={{
@@ -188,26 +217,9 @@ const MainStack = (props) => {
             }}
           />
         </>
-      ) : (
-        <>
-          <Stack.Screen
-            name="LogIn"
-            component={HomeScreen}
-            options={{
-              tabBarStyle: { display: 'none' },
-            }}
-          />
-          <Stack.Screen
-            name="Signup"
-            component={Signup}
-            options={{
-              tabBarButton: () => null,
-              tabBarStyle: { display: 'none' },
-            }}
-          />
-        </>
-      )}
+      ) 
+       }
     </Stack.Navigator>
   );
 };
-export default connect(mapStateToProps, null)(MainStack);
+export default connect(mapStateToProps, mapDispatchToProps)(MainStack);

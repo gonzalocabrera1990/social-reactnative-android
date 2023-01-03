@@ -2,6 +2,53 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ActionTypes from './ActionTypes';
 import { baseUrl } from '../shared/baseurl';
 
+export const checkToken = () => async (dispatch) => {
+  dispatch(tokenLoading());
+   const tok = await AsyncStorage.getItem('token');
+  const token = JSON.parse(tok);
+  const bearer = `Bearer ${token}`;
+  return fetch(baseUrl + `users/checkJWTtoken`, {
+    method: "GET",
+    headers: {
+      'Authorization': bearer
+    },
+  })
+  .then(response => {
+    
+    if (response.ok) {
+      return response;
+    } else {
+      dispatch(tokenCheck());
+      dispatch(loginError(response.statusText));
+      dispatch(logoutUser());
+      var error = new Error('Error ' + response.status + ': ' + response.statusText);
+      error.response = response;
+      throw error;
+    }
+  },
+    error => {
+      var errmess = new Error(error.message);
+      throw errmess;
+     })
+  .then(response => response.json())
+  .then(result => {
+    dispatch(tokenCheck());
+  })
+  .catch(error => {
+    dispatch(tokenCheck());
+  })
+}
+export const tokenLoading = () => ({
+  type: ActionTypes.TOKEN_LOADING
+});
+export const tokenCheck = () => ({
+  type: ActionTypes.TOKEN_CHECK
+});
+export const userCheck = () => ({
+  type: ActionTypes.USER_CHECK
+});
+
+
 export const loginUser = (creds) => (dispatch) => {
   // We dispatch requestLogin to kickoff the call to the API
   dispatch(requestLogin(creds));

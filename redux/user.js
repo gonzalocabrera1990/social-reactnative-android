@@ -9,6 +9,8 @@ export const User = (
   action
 ) => {
   switch (action.type) {
+      case ActionTypes.USER_CHECK:
+      return { ...state, isLoading: false, errMess: null, user: null };
     case ActionTypes.USER_SUCCESS:
       //Se usa el {...state} para iterar sobre las propiedades
       //declaradas en el state. Luego se le asignan los valores del caso.

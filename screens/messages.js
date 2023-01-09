@@ -10,21 +10,52 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 const { height, width } = Dimensions.get('window');
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
+import { connect } from 'react-redux';
 import { baseUrl } from '../shared/baseurl';
 
-export const Messages = ({ navigation, route }) => {
+import {
+  commentsPost,
+  fetchComments
+} from '../redux/ActionCreators';
+
+const mapStateToProps = (state) => {
+  return {
+    messageUpdate: state.messageUpdate
+  };
+};
+const mapDispatchToProps = (dispatch) => ({
+  commentsPost: (dataComment) => dispatch(commentsPost(dataComment)),
+  fetchComments: (idComments) => dispatch(fetchComments(idComments))
+});
+
+const Messages = ({ navigation, route, messageUpdate, commentsPost, fetchComments }) => {
   const [messages, setMessages] = useState(null);
   const [messageInput, setMessageInput] = useState('');
+
+  const [messagesLoading, setMessagesLoading] = useState(true);
   const [error, setError] = useState('');
+  const [ID, setId] = useState('');
+
+  useEffect(() => {
+    setMessagesLoading(true)
+    fetchComments(route.params.imgId)
+  }, []);
+  useEffect(() => {
+    setMessagesLoading(true)
+    setMessages(messageUpdate.messageUpdate);
+    if (messages) setMessagesLoading(false)
+  }, [messageUpdate.messageUpdate]);
 
   useFocusEffect(
     useCallback(() => {
-      setMessages(route.params.comments);
+      fetchComments(route.params.imgId)
+      if (messages) setMessagesLoading(false)
       return () => {
         // source.cancel('Api Canceled');
         setMessages(null);
@@ -35,84 +66,101 @@ export const Messages = ({ navigation, route }) => {
   const handleChangeMesssage = (text) => {
     setMessageInput(text);
   };
-  const fetchComments = () => {
-    return fetch(baseUrl + `comments/get-comments-image/${route.params.imgId}`)
-      .then((data) => data.json())
-      .then((json) => {
-        setMessages(json);
+  // const fetchComments = () => {
+  //   return fetch(baseUrl + `comments/get-comments-image/${route.params.imgId}`)
+  //     .then((data) => data.json())
+  //     .then((json) => {
+  //       setMessages(json);
+  //     })
+  //     .catch((err) => {
+  //       setError(err);
+  //     });
+  // };
+  // const handleMesssage = () => {
+  //   route.params.handleSubmit(
+  //     messageInput,
+  //     route.params.imgId,
+  //     route.params.startId,
+  //     fetchComments
+  //   );
+  // };
+  const handleSubmit = () => {
+    setMessagesLoading(true)
+    let commenta = {
+      comment: messageInput,
+      author: route.params.myUserId,
+      image: route.params.imgId
+    };
+    commentsPost(commenta)
+    // .then((sol) => {
+    //   let test = content.map((item) => {
+    //     if (item._id === startId) {
+    //       if (item.commento.length === 0) {
+    //         item.commento[0] = sol;
+    //       } else if (item.commento[0].length > 1) {
+    //         item.commento[0] = item.commento[0].concat(sol);
+    //       } else {
+    //         item.commento[0] = [item.commento[0], sol];
+    //       }
+    //       return item;
+    //     } else {
+    //       return item;
+    //     }
+    //   });
+    //   let valor = test.filter((item) => item._id === startId)[0];
+    //   let addComment =
+    //     valor.commento.length === 0
+    //       ? []
+    //       : valor.commento[0].length > 1
+    //       ? valor.commento[0]
+    //       : valor.commento;
+    //   setContent(test);
+    //   fetchComments();
+    //   setComments(addComment);
+    //   setActive('');
+    // });
+  }
+
+  let mapComments = messages === null || messagesLoading ?
+    <View style={styles.activityIndicator}>
+      <ActivityIndicator size="large" color="#00ff00" />
+    </View>
+    : 
+    messages[0] === undefined ?
+      <>
+        <Text style={styles.padding}>Sin comentarios todavia.</Text>
+        <Text style={styles.padding}>Se el primero en comentar</Text>
+      </>
+    :
+    (
+      messages.map((message) => {
+          return (
+            <View style={styles.commentsContent} key={message._id}>
+              <TouchableOpacity
+                style={styles.commentsContent}
+                onPress={() =>
+                  navigation.navigate('Users', {
+                    localId: route.params.myUserId,
+                    userId: message.author._id,
+                  })
+                }>
+                <Image
+                  style={styles.imgProfile}
+                  source={{ uri: `${baseUrl}${message.author.image.filename}` }}
+                />
+                <Text>
+                  <Text style={styles.author}>{message.author.usuario}</Text>
+                </Text>
+              </TouchableOpacity>
+              <Text style={styles.comments}>{message.comment}</Text>
+            </View>
+          )
       })
-      .catch((err) => {
-        setError(err);
-      });
-  };
-  const handleMesssage = () => {
-    route.params.handleSubmit(
-      messageInput,
-      route.params.imgId,
-      route.params.startId,
-      fetchComments
     );
-  };
-
-  let mapComments = !messages ? null : !messages[0] ? (
-    <>
-      <Text style={styles.padding}>Sin comentarios todavia.</Text>
-      <Text style={styles.padding}>Se el primero en comentar</Text>
-    </>
-  ) : messages[0][0] ? (
-    messages[0].map((message) => {
-      return (
-        <View style={styles.commentsContent}>
-          <TouchableOpacity
-            style={styles.commentsContent}
-            onPress={() =>
-              navigation.navigate('Users', {
-                localId: route.params.myUserId,
-                userId: message.author._id,
-              })
-            }>
-            <Image
-              style={styles.imgProfile}
-              source={{ uri: `${baseUrl}${message.author.image.filename}` }}
-            />
-            <Text>
-              <Text style={styles.author}>{message.author.usuario}</Text>
-            </Text>
-          </TouchableOpacity>
-          <Text style={styles.comments}>{message.comment}</Text>
-        </View>
-      );
-    })
-  ) : (
-    messages.map((message) => {
-      return (
-        <View style={styles.commentsContent}>
-          <TouchableOpacity
-            style={styles.commentsContent}
-            onPress={() =>
-              navigation.navigate('Users', {
-                localId: route.params.myUserId,
-                userId: message.author._id,
-              })
-            }>
-            <Image
-              style={styles.imgProfile}
-              source={{ uri: `${baseUrl}${message.author.image.filename}` }}
-            />
-            <Text>
-              <Text style={styles.author}>{message.author.usuario}</Text>
-            </Text>
-          </TouchableOpacity>
-          <Text style={styles.comments}>{message.comment}</Text>
-        </View>
-      );
-    })
-  );
-
   return (
     <View style={styles.container}>
-        
-        <StatusBar backgroundColor="#FFF" barStyle="dark-content" />
+
+      <StatusBar backgroundColor="#FFF" barStyle="dark-content" />
       <View style={styles.arrowBack}>
         <MaterialCommunityIcons
           name="keyboard-backspace"
@@ -145,7 +193,7 @@ export const Messages = ({ navigation, route }) => {
                   name="email-mark-as-unread"
                   size={24}
                   color="black"
-                  onPress={() => handleMesssage()}
+                  onPress={() => handleSubmit()}
                 />
               </View>
             </View>
@@ -159,6 +207,9 @@ export const Messages = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     height: height,
+  },
+  activityIndicator: {
+    marginTop: 15,
   },
   arrowBack: {
     position: 'absolute',
@@ -251,3 +302,4 @@ const styles = StyleSheet.create({
     paddingBottom: '20%',
   },
 });
+export default connect(mapStateToProps, mapDispatchToProps)(Messages)

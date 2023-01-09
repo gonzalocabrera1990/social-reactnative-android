@@ -12,7 +12,9 @@ import {
   TextInput,
   Button,
 } from 'react-native';
-import { commentsPost } from '../redux/ActionCreators';
+import { commentsPost, 
+  postImageLike,
+  postVideoLike } from '../redux/ActionCreators';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { connect } from 'react-redux';
@@ -36,9 +38,13 @@ const mapStateToProps = (state) => {
 };
 const mapDispatchToProps = (dispatch) => ({
   commentsPost: (dataComment) => dispatch(commentsPost(dataComment)),
+  postImageLike: (imageid, usersData) =>
+  dispatch(postImageLike(imageid, usersData)),
+postVideoLike: (videoid, usersData) =>
+  dispatch(postVideoLike(videoid, usersData))
 });
 
-const ImageWall = ({ route, navigation, user, users, commentsPost }) => {
+const ImageWall = ({ route, navigation, user, users, commentsPost, postImageLike, postVideoLike }) => {
   const [userState, setUserState] = useState(null);
   const [index, setIndex] = useState(null);
   const [userpage, setUserpage] = useState(null);
@@ -81,6 +87,25 @@ const ImageWall = ({ route, navigation, user, users, commentsPost }) => {
     }, [])
   );
 
+  const handleLike = async (imgID, tag, cb) => {
+    let img = await imgID;
+    const asyncuser = await AsyncStorage.getItem('id');
+    const userid = JSON.parse(asyncuser);
+    var usersData = {
+      id: userid,
+      liked: img,
+    };
+    if (tag === 'imagen') {
+      postImageLike(img, usersData).then((resp) => {
+        cb(resp);
+      });
+    } else {
+      postVideoLike(img, usersData).then((resp) => {
+        cb(resp);
+      });
+    }
+  };
+  
   const handleCommentSubmit = (value, imgID, cb) => {
     const comment = {
       comment: value,
@@ -118,7 +143,7 @@ const ImageWall = ({ route, navigation, user, users, commentsPost }) => {
                 idUser={ID}
                 navigation={navigation}
                 userpage={userpage}
-                handleLike={route.params.handleLike}
+                handleLike={handleLike}
                 handleCommentSubmit={handleCommentSubmit}
               />
             )}
@@ -135,7 +160,7 @@ const ImageWall = ({ route, navigation, user, users, commentsPost }) => {
                 idUser={ID}
                 navigation={navigation}
                 userpage={userpage}
-                handleLike={route.params.handleLike}
+                handleLike={handleLike}
                 handleCommentSubmit={handleCommentSubmit}
               />
             )}

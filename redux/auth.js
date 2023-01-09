@@ -65,7 +65,7 @@ export const Auth = (
       case ActionTypes.RELOAD_AUTH:
       return {
         ...state,
-        isLoading: false,
+        isLoading: action.payload.isLoading,
         isAuthenticated: action.payload.isAuthenticated ? true : false, 
         id: action.payload.id,
         token: action.payload.token,

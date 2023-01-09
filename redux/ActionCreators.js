@@ -4,7 +4,7 @@ import { baseUrl } from '../shared/baseurl';
 
 export const checkToken = () => async (dispatch) => {
   dispatch(tokenLoading());
-   const tok = await AsyncStorage.getItem('token');
+  const tok = await AsyncStorage.getItem('token');
   const token = JSON.parse(tok);
   const bearer = `Bearer ${token}`;
   return fetch(baseUrl + `users/checkJWTtoken`, {
@@ -13,30 +13,30 @@ export const checkToken = () => async (dispatch) => {
       'Authorization': bearer
     },
   })
-  .then(response => {
-    
-    if (response.ok) {
-      return response;
-    } else {
+    .then(response => {
+
+      if (response.ok) {
+        return response;
+      } else {
+        dispatch(tokenCheck());
+        dispatch(loginError(response.statusText));
+        dispatch(logoutUser());
+        var error = new Error('Error ' + response.status + ': ' + response.statusText);
+        error.response = response;
+        throw error;
+      }
+    },
+      error => {
+        var errmess = new Error(error.message);
+        throw errmess;
+      })
+    .then(response => response.json())
+    .then(result => {
       dispatch(tokenCheck());
-      dispatch(loginError(response.statusText));
-      dispatch(logoutUser());
-      var error = new Error('Error ' + response.status + ': ' + response.statusText);
-      error.response = response;
-      throw error;
-    }
-  },
-    error => {
-      var errmess = new Error(error.message);
-      throw errmess;
-     })
-  .then(response => response.json())
-  .then(result => {
-    dispatch(tokenCheck());
-  })
-  .catch(error => {
-    dispatch(tokenCheck());
-  })
+    })
+    .catch(error => {
+      dispatch(tokenCheck());
+    })
 }
 export const tokenLoading = () => ({
   type: ActionTypes.TOKEN_LOADING
@@ -153,10 +153,12 @@ export const receiveLogout = () => {
   };
 };
 //INBOX
-export const inboxFetch = () => (dispatch) => {
+export const inboxFetch = () => async (dispatch) => {
   dispatch(inboxLoading());
   const QUERY = JSON.parse(AsyncStorage.getItem('id'));
-  const bearer = 'Bearer ' + AsyncStorage.getItem('token');
+  const tok = await AsyncStorage.getItem('token');
+  const token = JSON.parse(tok);
+  const bearer = `Bearer ${token}`;
   return fetch(baseUrl + `inbox-message/getch/${QUERY}`, {
     method: 'GET',
     headers: {
@@ -242,6 +244,7 @@ export const fetchUser = (id) => async (dispatch) => {
       );
 
       dispatch(receiveUser(response));
+      return response
     })
     .catch((error) => dispatch(receiveUserError(error)));
 };
@@ -266,10 +269,12 @@ export const receiveUserError = (error) => {
 //FETCH USERS COMPONENT
 export const fetchDataUser = (url) => async (dispatch) => {
   dispatch(usersLoading());
+  let host = url.host
+  let user = url.user
   const tok = await AsyncStorage.getItem('token');
   const token = JSON.parse(tok);
   const bearer = `Bearer ${token}`;
-  return fetch(baseUrl + `users/native-users/${url.host}/${url.user}`, {
+  return fetch(baseUrl + `users/native-users/${host}/${user}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -353,9 +358,11 @@ export const addStart = (start) => ({
   payload: start,
 });
 //GET Users followers
-export const fetchFollowers = () => (dispatch) => {
+export const fetchFollowers = () => async (dispatch) => {
   dispatch(followersLoading());
-  const bearer = 'Bearer ' + AsyncStorage.getItem('token');
+  const tok = await AsyncStorage.getItem('token');
+  const token = JSON.parse(tok);
+  const bearer = `Bearer ${token}`;
   const QUERY = JSON.parse(AsyncStorage.getItem('id'));
   return fetch(baseUrl + `users/followers-notifications-return/${QUERY}`, {
     method: 'GET',
@@ -456,16 +463,16 @@ export const fetchFollowing = () => async (dispatch) => {
       let measureNoSeenStory = !nss
         ? null
         : nss.map((u) =>
-            u.id.stories.filter((s) => measure(s.timestamp) <= 13240)
-          );
+          u.id.stories.filter((s) => measure(s.timestamp) <= 13240)
+        );
       let filterMeasureNoSeenStory = measureNoSeenStory.filter(
         (n) => n.length > 0
       );
       let measureSeenStory = !ss
         ? null
         : ss.map((u) =>
-            u.id.stories.filter((s) => measure(s.timestamp) <= 13240)
-          );
+          u.id.stories.filter((s) => measure(s.timestamp) <= 13240)
+        );
       let filterMeasureSeenStory = measureSeenStory.filter((n) => n.length > 0);
       const storyStore = {
         users: {
@@ -477,7 +484,6 @@ export const fetchFollowing = () => async (dispatch) => {
           seen: filterMeasureSeenStory,
         },
       };
-      console.log(storyStore)
       return storyStore;
     })
     .then((list) => {
@@ -506,9 +512,11 @@ export const followingError = (message) => {
 };
 
 //DELETE IMAGE WALL
-export const removePhotograph = (imgId) => (dispatch) => {
+export const removePhotograph = (imgId) => async (dispatch) => {
   dispatch(userLoading());
-  const bearer = 'Bearer ' + AsyncStorage.getItem('token');
+  const tok = await AsyncStorage.getItem('token');
+  const token = JSON.parse(tok);
+  const bearer = `Bearer ${token}`;
   // var config = {
   //   userid: JSON.parse(AsyncStorage.getItem("id")),
   //     imageid: imgId
@@ -670,8 +678,10 @@ export const errorSettings = (creds) => {
 
 //IMAGEN FETCH
 
-export const imagenUser = (userID, image) => (dispatch) => {
-  const bearer = 'Bearer ' + AsyncStorage.getItem('token');
+export const imagenUser = (userID, image) => async (dispatch) => {
+  const tok = await AsyncStorage.getItem('token');
+  const token = JSON.parse(tok);
+  const bearer = `Bearer ${token}`;
   return fetch(baseUrl + 'imagen/profile-image-post/change/' + userID, {
     method: 'POST',
     body: image,
@@ -708,50 +718,82 @@ export const imagenUser = (userID, image) => (dispatch) => {
 
 //IMAGEN WALL FETCH
 
-export const imagenWall = (userID, image) => (dispatch) => {
-  const bearer = 'Bearer ' + AsyncStorage.getItem('token');
-  // console.log("imagen fd en actioncreator",image.values().next());
-  // console.log("imagen fd en actioncreator",image.entries().next());
-  // console.log("imagen fd en actioncreator",image.values().next());
-  // console.log("imagen fd en actioncreator",image.entries().next());
-  // console.log("imagen fd en actioncreator",image.values().next());
-  // console.log("imagen fd en actioncreator",image.entries().next());
+export const imagenWall = (userID, image) => async (dispatch) => {
 
-  // return fetch(baseUrl + "imagen/imageswall/" + userID, {
-  //   method: "POST",
-  //   body: image,
-  //   headers: {
-  //     'Authorization': bearer
-  //   },
-  //   credentials: "same-origin"
-  // })
-  //   .then(response => {
-  //     if (response.ok) {
-  //       return response;
-  //     } else {
-  //       var error = new Error("Image Error " + response.status + ": " + response.statusText);
-  //       error.response = response;
-  //       throw error;
-  //     }
-  //   },
-  //     error => {
-  //       var errmess = new Error(error.message);
-  //       throw errmess;
-  //     }
-  //   )
-  //   .then(response => {
-  //     console.log('response', response);
-  //     //dispatch(fetchUser(userID));
-  //   })
-  //   .catch(error => {
-  //     console.log("SETTINGS ERROR");
-  //   });
+  const tok = await AsyncStorage.getItem('token');
+  const token = JSON.parse(tok);
+  const bearer = `Bearer ${token}`;
+  return fetch(baseUrl + "imagen/imageswall/" + userID, {
+    method: "POST",
+    body: image,
+    headers: {
+      'Authorization': bearer
+    },
+    credentials: "same-origin"
+  })
+    .then(response => {
+      if (response.ok) {
+        return response;
+      } else {
+        var error = new Error("Image Error " + response.status + ": " + response.statusText);
+        error.response = response;
+        throw error;
+      }
+    },
+      error => {
+        var errmess = new Error(error.message);
+        throw errmess;
+      }
+    )
+    .then(response => {
+      return response
+    })
+    .catch(error => {
+      console.log("SETTINGS ERROR");
+    });
+};
+
+//STORIES
+export const storiesCreator = (userID, image) => async (dispatch) => {
+  const tok = await AsyncStorage.getItem('token');
+  const token = JSON.parse(tok);
+  const bearer = `Bearer ${token}`;
+  return fetch(baseUrl + "imagen/story-post/" + userID, {
+    method: "POST",
+    body: image,
+    headers: {
+      'Authorization': bearer
+    },
+    credentials: "same-origin"
+  })
+    .then(response => {
+      if (response.ok) {
+        return response;
+      } else {
+        var error = new Error("Image Error " + response.status + ": " + response.statusText);
+        error.response = response;
+        throw error;
+      }
+    },
+      error => {
+        var errmess = new Error(error.message);
+        throw errmess;
+      }
+    )
+    .then(response => {
+      return response
+    })
+    .catch(error => {
+      console.log("SETTINGS ERROR");
+    });
 };
 
 //FETCH IMAGEN AND COMMENTS TO ImagenComponent
-export const imagenFetch = (image) => (dispatch) => {
+export const imagenFetch = (image) => async (dispatch) => {
   dispatch(imagenLoading());
-  const bearer = 'Bearer ' + AsyncStorage.getItem('token');
+  const tok = await AsyncStorage.getItem('token');
+  const token = JSON.parse(tok);
+  const bearer = `Bearer ${token}`;
   return fetch(baseUrl + `imagen/view/imagenwall/${image}`, {
     method: 'GET',
     headers: {
@@ -955,7 +997,7 @@ export const friendRequestResponse = (dataNotification) => async (dispatch) => {
 
   return fetch(
     baseUrl +
-      `notification/following-request/${dataNotification.followerId}/${dataNotification.notiId}`,
+    `notification/following-request/${dataNotification.followerId}/${dataNotification.notiId}`,
     {
       method: 'POST',
       body: JSON.stringify(data),
@@ -1004,6 +1046,7 @@ export const handleNotificationStatus = () => (dispatch) => {
 //COMMENTS POST
 
 export const commentsPost = (dataComment) => async (dispatch) => {
+  dispatch(messageUpdateLoading())
   const newComment = {
     comment: dataComment.comment,
     author: dataComment.author,
@@ -1040,9 +1083,50 @@ export const commentsPost = (dataComment) => async (dispatch) => {
         }
       )
       .then((response) => response.json())
-      // .then(start => dispatch(addStart(start)))
-      .catch((error) => dispatch(startFailed(error.message)))
+      .then(comments => {
+        dispatch(messageUpdateSuccess(comments))
+      })
+      .catch((error) => dispatch(messageUpdateError(error.message)))
   );
+};
+export const messageUpdateLoading = () => {
+  return {
+    type: ActionTypes.MESSAGEUPDATE_LOADING,
+  };
+};
+
+export const messageUpdateSuccess = (messageUpdate) => {
+  return {
+    type: ActionTypes.MESSAGEUPDATE_SUCCESS,
+    payload: messageUpdate,
+  };
+};
+
+export const messageUpdateError = (messageUpdate) => {
+  return {
+    type: ActionTypes.MESSAGEUPDATE_ERROR,
+    ERR: messageUpdate,
+  };
+};
+
+export const fetchComments = (imgId) => async (dispatch) => {
+  dispatch(messageUpdateLoading())
+  const tok = await AsyncStorage.getItem('token');
+  const token = JSON.parse(tok);
+  const bearer = `Bearer ${token}`;
+  return fetch(baseUrl + `comments/get-comments-image/${imgId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: bearer,
+    },
+    credentials: 'same-origin',
+  })
+    .then((response) => response.json())
+    .then(comments => {
+      dispatch(messageUpdateSuccess(comments))
+    })
+    .catch((error) => dispatch(messageUpdateError(error.message)))
 };
 
 // LIKE FETCH
@@ -1121,7 +1205,9 @@ export const postLike = (imageid, usersData) => async (dispatch) => {
     id: await usersData.id,
     liked: await usersData.liked,
   };
-  const bearer = 'Bearer ' + AsyncStorage.getItem('token');
+  const tok = await AsyncStorage.getItem('token');
+  const token = JSON.parse(tok);
+  const bearer = `Bearer ${token}`;
 
   return fetch(baseUrl + 'likes/post-i-like-it/' + (await imageid), {
     method: 'POST',
@@ -1155,9 +1241,11 @@ export const postLike = (imageid, usersData) => async (dispatch) => {
     .catch((error) => console.log(error.message)); //dispatch(favoritesFailed(error.message)));
 };
 
-export const fetchLikes = (userId, imgId) => (dispatch) => {
+export const fetchLikes = (userId, imgId) => async (dispatch) => {
   //dispatch(likesLoading());
-  const bearer = 'Bearer ' + AsyncStorage.getItem('token');
+  const tok = await AsyncStorage.getItem('token');
+  const token = JSON.parse(tok);
+  const bearer = `Bearer ${token}`;
   return fetch(baseUrl + `likes/get-i-like-it/${userId}/${imgId}`, {
     method: 'GET',
     headers: {
@@ -1282,42 +1370,6 @@ export const postVideoLike = (videoid, usersData) => async (dispatch) => {
     .catch((error) => console.log(error.message)); //dispatch(favoritesFailed(error.message)));
 };
 
-//STORIES
-export const storiesCreator = (userID, image) => (dispatch) => {
-  const bearer = 'Bearer ' + localStorage.getItem('token');
-
-  return fetch(baseUrl + 'imagen/story-post/' + userID, {
-    method: 'POST',
-    body: image,
-    headers: {
-      Authorization: bearer,
-    },
-    credentials: 'same-origin',
-  })
-    .then(
-      (response) => {
-        if (response.ok) {
-          return response;
-        } else {
-          var error = new Error(
-            'Image Error ' + response.status + ': ' + response.statusText
-          );
-          error.response = response;
-          throw error;
-        }
-      },
-      (error) => {
-        var errmess = new Error(error.message);
-        throw errmess;
-      }
-    )
-    .then((response) => {
-      console.log('response', response);
-    })
-    .catch((error) => {
-      console.log('SETTINGS ERROR');
-    });
-};
 const measure = (timestamp) => {
   let inicio = new Date(timestamp).getTime();
   let now = Date.now();
@@ -1343,8 +1395,10 @@ export const receiveStoryError = (error) => {
   };
 };
 
-export const storiesView = (userID, image) => (dispatch) => {
-  const bearer = 'Bearer ' + localStorage.getItem('token');
+export const storiesView = (userID, image) => async (dispatch) => {
+  const tok = await AsyncStorage.getItem('token');
+  const token = JSON.parse(tok);
+  const bearer = `Bearer ${token}`;
 
   return fetch(baseUrl + `imagen/story-view/${userID}/${image}`, {
     method: 'POST',

@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-//import { Video } from 'expo-av';
+import { Video } from 'expo-av';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   fetchVideoNativeLikes,
@@ -43,7 +43,8 @@ const RenderItemVid = ({
   const [comments, setComments] = useState([]);
   const [iLikeIt, setILikeIt] = useState('black');
   const [ID, setId] = useState('');
-
+  const [status, setStatus] = useState({});
+  let playVideo = React.createRef();
   useEffect(() => {
     (async function () {
       let id = await AsyncStorage.getItem('id');
@@ -118,15 +119,22 @@ const RenderItemVid = ({
         />
       </View>
       <View style={styles.imageContent}>
-        {/* <Video
-          resizeMode="stretch"
+      <TouchableOpacity style={status.isPlaying ? styles.iconPause : styles.iconPlay } onPress={() =>
+          status.isPlaying ? playVideo.current.pauseAsync() : playVideo.current.playAsync()
+        }>
+          <MaterialCommunityIcons name="play" size={50} color={status.isPlaying ? 'transparent' : 'green'} />
+        </TouchableOpacity>
+        <Video
+        ref={playVideo}
+          source={{ uri: `${baseUrl}${item.filename}` }}
+          key={item._id}
+          resizeMode="contain"
           style={{
             aspectRatio: 1,
             width: '100%',
           }}
-          source={{ uri: `${baseUrl}${item.filename}` }}
-        /> */}
-        <Text>Video</Text>
+          onPlaybackStatusUpdate={setStatus}
+        />
       </View>
       <View style={styles.info}>
         <View>
@@ -187,12 +195,7 @@ const RenderItemVid = ({
                 comments[1] !== undefined ? (
                 <View>
                   <View style={styles.commentsContent}>
-                    <View
-                    // to={`/profiles/${props.usuario}/${
-                    //   comments[0][comments[0].length - 2].author
-                    //     .usuario
-                    // }`}
-                    >
+                    <View>
                       <TouchableOpacity
                         style={styles.user}
                         onPress={() =>
@@ -211,12 +214,7 @@ const RenderItemVid = ({
                     </Text>
                   </View>
                   <View style={styles.commentsContent}>
-                    <Text
-                    // to={`/profiles/${props.usuario}/${
-                    //   comments[0][comments[0].length - 1].author
-                    //     .usuario
-                    // }`}
-                    >
+                    <Text>
                       <TouchableOpacity
                         style={styles.user}
                         onPress={() =>
@@ -237,9 +235,7 @@ const RenderItemVid = ({
                 </View>
               ) : comments[0] !== undefined && comments[1] == undefined ? (
                 <View style={styles.commentsContent}>
-                  <Text
-                  // to={`/profiles/${props.usuario}/${comments[0].author.usuario}`}
-                  >
+                  <Text>
                     <TouchableOpacity
                       style={styles.user}
                       onPress={() =>
@@ -264,22 +260,13 @@ const RenderItemVid = ({
               onPress={() =>
                 navigation.navigate('MsProfile', {
                   imgId: item._id,
-                  comments: comments,
-                  myUserId: userpage._id,
-                  handleCommentSubmit: handleCommentSubmit,
+                  myUserId: userpage._id
                 })
               }>
               <MaterialCommunityIcons
                 name="comment-text-multiple"
                 size={24}
                 color={'green'}
-
-                //  onPress={() =>
-                //   navigation.navigate('MessagesProfile', {
-                //     comments: comments,
-                //     myUserId: props.userpage._id
-                //   })
-                // }
               />
             </TouchableOpacity>
           </View>
@@ -314,10 +301,34 @@ const styles = StyleSheet.create({
   imageContent: {
     flex: 1,
   },
+  iconPause: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    top:0,
+    right: 0,
+    left: 0,
+    bottom: 0,
+    zIndex:10
+  },
+  iconPlay: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    top:0,
+    right: 0,
+    left: 0,
+    bottom: 0,
+    zIndex:10,
+    color: 'transparent'
+  },
   info: {
     display: 'flex',
+    flexDirection: 'column',
     justifyContent: 'space-between',
-    alignItems: 'space-between',
+    alignItems: 'flex-start',
   },
   imgProfile: {
     height: 50,
@@ -326,7 +337,8 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   form: {
-    flex: 1,
+    width: Dimensions.get('window').width,
+    paddingRight: 10,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',

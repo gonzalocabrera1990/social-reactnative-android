@@ -8,9 +8,9 @@ import Inbox from '../screens/inbox';
 import HomeScreen from '../screens/login';
 import Signup from '../screens/signup';
 import ImageWall from '../screens/ImageWall';
-import { Messages } from '../screens/messages';
+import Messages from '../screens/messages';
 import { Likes } from '../screens/likes';
-import { MProfile } from '../screens/profileItemsmessages';
+import MProfile from '../screens/profileItemsmessages';
 import { Search } from '../screens/search';
 import Follows from '../screens/follows';
 import Notifications from '../screens/notifications';
@@ -20,12 +20,15 @@ import { Start } from '../screens/start';
 import { Poster } from '../screens/poster';
 import Userpage from '../screens/userpage';
 import Users from '../screens/users';
+import ImageProfile from '../screens/profileImage';
 import {
   checkToken
 } from '../redux/ActionCreators';
+import * as ActionTypes from '../redux/ActionTypes';
+
 
 // import AuthLoadingScreen from '../components/AuthLoadingScreen';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 
 const mapStateToProps = (state) => {
   return {
@@ -41,27 +44,55 @@ const Stack = createBottomTabNavigator();
 // const auth = this.props.auth.auth.isAuthenticated;
 // console.log("navbar", auth);
 const MainStack = (props) => {
+  const dispatch = useDispatch();
   useEffect(() => {
    
-    async function payload() {
-       const tokP = await AsyncStorage.getItem('token');
-       const userP = await AsyncStorage.getItem('creds');
-       const idP = await AsyncStorage.getItem('id');
-       const tok = JSON.parse(tokP);
-       const user = JSON.parse(userP);
-       const id = JSON.parse(idP);
-       props.dispatch({
-         type: 'RELOAD_AUTH',
-         payload: {
-           isAuthenticated: tok,
-           token: tok,
-           user: user,
-           id: id,
-         },
-       });
+    // async function payload() {
+    //    const tokP = await AsyncStorage.getItem('token');
+    //    const userP = await AsyncStorage.getItem('creds');
+    //    const idP = await AsyncStorage.getItem('id');
+    //    const tok = !tokP ? null : JSON.parse(tokP);
+    //    const user = !userP ? null : JSON.parse(userP);
+    //    const id = !idP ? null : JSON.parse(idP);
+    //    if(tok && user && id){
+    //     props.dispatch({
+    //       type: ActionTypes.RELOAD_AUTH,
+    //       payload: {
+    //         isAuthenticated: tok,
+    //         token: tok,
+    //         user: user,
+    //         id: id,
+    //         isLoading: false
+    //       }
+    //     });
+    //    }
+       
+    //  }
+    //  payload();
+    //  props.checkToken()
+     async function payload() {
+      const tokP = await AsyncStorage.getItem('token');
+      const userP = await AsyncStorage.getItem('creds');
+      const idP = await AsyncStorage.getItem('id');
+      const tok = !tokP ? null : JSON.parse(tokP);
+      const user = !userP ? null : JSON.parse(userP);
+      const id = !idP ? null : JSON.parse(idP);
+      return {
+       type: ActionTypes.RELOAD_AUTH,
+       payload: {
+         isAuthenticated: tok ? true : false,
+         token: tok,
+         user: user,
+         id: id,
+         isLoading: false
+       }
      }
-     payload();
-     props.checkToken()
+    }
+    payload()
+    .then(res => {
+      dispatch(res);
+    })
+    .catch(error => console.error(error))
    }, []);
 
   return (
@@ -128,6 +159,7 @@ const MainStack = (props) => {
       )
         
         :
+        props.auth.isAuthenticated ?
         (
         <>
           <Stack.Screen name="Home" component={Start} />
@@ -202,6 +234,14 @@ const MainStack = (props) => {
             }}
           />
           <Stack.Screen
+            name="ImageProfile"
+            component={ImageProfile}
+            options={{
+              tabBarButton: () => null,
+              tabBarStyle: { display: 'none' },
+            }}
+          />
+          <Stack.Screen
             name="Users"
             component={Users}
             options={{
@@ -218,6 +258,7 @@ const MainStack = (props) => {
           />
         </>
       ) 
+      : null
        }
     </Stack.Navigator>
   );

@@ -18,9 +18,6 @@ import { baseUrl } from '../shared/baseurl';
 import { connect } from 'react-redux';
 import {
   fetchDataUser,
-  postImageLike,
-  postVideoLike,
-  commentsPost,
   followFetch,
   fetchFollowers,
   fetchFollowing,
@@ -34,12 +31,7 @@ const mapStateToProps = (state) => {
   };
 };
 const mapDispatchToProps = (dispatch) => ({
-  fetchDataUser: (urls) => dispatch(fetchDataUser(urls)),
-  postImageLike: (imageid, usersData) =>
-    dispatch(postImageLike(imageid, usersData)),
-  postVideoLike: (videoid, usersData) =>
-    dispatch(postVideoLike(videoid, usersData)),
-  commentsPost: (dataComment) => dispatch(commentsPost(dataComment)),
+  fetchDataUser: (url) => dispatch(fetchDataUser(url)),
   followFetch: (followingId, followerId) => dispatch(followFetch(followingId, followerId)),
   
 });
@@ -75,7 +67,7 @@ const Users = (props) => {
     // }
   }, [props.route.params.localId, props.route.params.userId]);
   useEffect(() => {
-    props.fetchDataUser(info);
+    if(info) props.fetchDataUser(info);
   }, [info]);
   useEffect(() => {
     setUserpage(props.users.users);
@@ -91,27 +83,8 @@ const Users = (props) => {
     const followingId = props.route.params.localId;
     const userData = followerId;
     props.followFetch(followingId, userData).then((resp) => {
-      props.fetchDataUser(info);
+      if(info) props.fetchDataUser(info);
     });
-  };
-
-  const handleLike = async (imgID, tag, cb) => {
-    let img = await imgID;
-    const asyncuser = await AsyncStorage.getItem('id');
-    const userid = JSON.parse(asyncuser);
-    var usersData = {
-      id: userid,
-      liked: img,
-    };
-    if (tag === 'imagen') {
-      props.postImageLike(img, usersData).then((resp) => {
-        cb(resp);
-      });
-    } else {
-      props.postVideoLike(img, usersData).then((resp) => {
-        cb(resp);
-      });
-    }
   };
 
   const toogleMedia = (value) => {
@@ -138,9 +111,7 @@ const Users = (props) => {
                   props.navigation.navigate('ImageWall', {
                     itemId: img._id,
                     info: u,
-                    mediaType: 'photo',
-                    handleLike: handleLike,
-                    commentsPost: commentsPost,
+                    mediaType: 'photo'
                   })
                 }>
                 <Image
@@ -159,9 +130,7 @@ const Users = (props) => {
                   props.navigation.navigate('ImageWall', {
                     itemId: img._id,
                     info: u,
-                    mediaType: 'video',
-                    handleLike: handleLike,
-                    commentsPost: commentsPost,
+                    mediaType: 'video'
                   })
                 }>
                   <Video
@@ -332,7 +301,7 @@ const Users = (props) => {
               </View>
             </View>
 
-            <View style={styles.imageWallContent}>{u.message}</View>
+            <Text style={styles.imageWallContent}>{u.message}</Text>
           </View>
         );
       });

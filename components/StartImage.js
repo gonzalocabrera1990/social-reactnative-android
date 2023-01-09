@@ -28,7 +28,6 @@ export const StartImage = ({
   myUserId,
   navigation,
   handleLike,
-  handleSubmit,
 }) => {
   const [comments, setComments] = useState([]);
   const [likes, setLikes] = useState([]);
@@ -169,18 +168,12 @@ export const StartImage = ({
               ) : null}
             </View>
 
-            {
-            /* <View>
+            <View>
               {comments[0] === undefined ? null : comments[0] !== undefined &&
                 comments[0][1] !== undefined ? (
                 <View>
                   <View style={styles.commentsContent}>
-                    <View
-                    // to={`/profiles/${props.usuario}/${
-                    //   comments[0][comments[0].length - 2].author
-                    //     .usuario
-                    // }`}
-                    >
+                    <View>
                       <TouchableOpacity
                         style={styles.user}
                         onPress={() =>
@@ -200,12 +193,7 @@ export const StartImage = ({
                     </Text>
                   </View>
                   <View style={styles.commentsContent}>
-                    <Text
-                    // to={`/profiles/${props.usuario}/${
-                    //   comments[0][comments[0].length - 1].author
-                    //     .usuario
-                    // }`}
-                    >
+                    <Text>
                       <TouchableOpacity
                         style={styles.user}
                         onPress={() =>
@@ -227,9 +215,7 @@ export const StartImage = ({
                 </View>
               ) : comments[0] !== undefined ? (
                 <View style={styles.commentsContent}>
-                  <Text
-                  // to={`/profiles/${props.usuario}/${comments[0].author.usuario}`}
-                  >
+                  <Text>
                     <TouchableOpacity
                       style={styles.user}
                       onPress={() =>
@@ -246,7 +232,7 @@ export const StartImage = ({
                   <Text style={styles.comments}>{comments[0].comment}</Text>
                 </View>
               ) : null}
-            </View> */}
+            </View> 
           </View>
           <View>
             <MaterialCommunityIcons
@@ -255,11 +241,9 @@ export const StartImage = ({
               color={'green'}
               onPress={() =>
                 navigation.navigate('Messages', {
-                  comments: image.commento,
                   myUserId: JSON.parse(ID),
                   imgId: image.imageId._id,
-                  startId: image._id,
-                  handleSubmit: handleSubmit,
+                  startId: image._id
                 })
               }
             />
@@ -305,25 +289,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    margin: '0px',
+    margin: 0,
     padding: 8,
   },
   author: {
-    fontSize: '14px',
-    marginRight: '10px',
+    fontSize: 14,
+    marginRight: 10,
     color: 'black',
   },
   comments: {
     color: 'rgb(136, 135, 135)',
-    fontSize: '12px',
+    fontSize: 12,
   },
   imageContent: {
     flex: 1,
   },
-  info: {
+ info: {
     display: 'flex',
+    flexDirection: 'column',
     justifyContent: 'space-between',
-    alignItems: 'space-between',
+    alignItems: 'flex-start',
   },
   imgProfile: {
     height: 50,
@@ -332,7 +317,8 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   form: {
-    flex: 1,
+    width: Dimensions.get('window').width,
+    paddingRight: 10,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',

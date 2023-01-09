@@ -151,12 +151,15 @@ const RenderItem = ({
         />
       </View>
       <View style={styles.imageContent}>
-        <Image
-          width={Dimensions.get('window').width} // height will be calculated automatically
+          <Image
+          style={styles.imagina}
+          resizeMode={'contain'} // height will be calculated automatically
           source={{ uri: `${baseUrl}${item.filename}` }}
         />
       </View>
       <View style={styles.info}>
+        {//likes
+            }
         <View>
           {likes.length > 1 ? (
             <TouchableOpacity
@@ -191,7 +194,11 @@ const RenderItem = ({
           )}
         </View>
         <View style={styles.form}>
+          {//cantidad y comentarios
+            }
           <View>
+            {//cantidad comentarios
+            }
             <View>
               {comments.length == 0 ? (
                 <>
@@ -210,17 +217,14 @@ const RenderItem = ({
                 </Text>
               ) : null}
             </View>
+             {//mostrar comentarios
+            }
             <View>
               {comments[0] === undefined ? null : comments[0] !== undefined &&
                 comments[1] !== undefined ? (
                 <View>
                   <View style={styles.commentsContent}>
-                    <View
-                    // to={`/profiles/${props.usuario}/${
-                    //   comments[0][comments[0].length - 2].author
-                    //     .usuario
-                    // }`}
-                    >
+                    <View>
                       <TouchableOpacity
                         style={styles.user}
                         onPress={() =>
@@ -239,12 +243,7 @@ const RenderItem = ({
                     </Text>
                   </View>
                   <View style={styles.commentsContent}>
-                    <Text
-                    // to={`/profiles/${props.usuario}/${
-                    //   comments[0][comments[0].length - 1].author
-                    //     .usuario
-                    // }`}
-                    >
+                    <Text>
                       <TouchableOpacity
                         style={styles.user}
                         onPress={() =>
@@ -265,9 +264,7 @@ const RenderItem = ({
                 </View>
               ) : comments[0] !== undefined && comments[1] == undefined ? (
                 <View style={styles.commentsContent}>
-                  <Text
-                  // to={`/profiles/${props.usuario}/${comments[0].author.usuario}`}
-                  >
+                  <Text>
                     <TouchableOpacity
                       style={styles.user}
                       onPress={() =>
@@ -286,28 +283,21 @@ const RenderItem = ({
               ) : null}
             </View>
           </View>
+          {//boton comentarios
+            }
           <View>
             <TouchableOpacity
               style={styles.user}
               onPress={() =>
                 navigation.navigate('MsProfile', {
                   imgId: item._id,
-                  comments: comments,
-                  myUserId: userpage._id,
-                  handleCommentSubmit: handleCommentSubmit,
+                  myUserId: userpage._id
                 })
               }>
               <MaterialCommunityIcons
                 name="comment-text-multiple"
                 size={24}
                 color={'green'}
-
-                //  onPress={() =>
-                //   navigation.navigate('MessagesProfile', {
-                //     comments: comments,
-                //     myUserId: props.userpage._id
-                //   })
-                // }
               />
             </TouchableOpacity>
           </View>
@@ -342,10 +332,17 @@ const styles = StyleSheet.create({
   imageContent: {
     flex: 1,
   },
+  imagina: {
+    flex: 1,
+        alignSelf: 'stretch',
+        width: Dimensions.get('window').width,
+        aspectRatio: 1
+},
   info: {
     display: 'flex',
+    flexDirection: 'column',
     justifyContent: 'space-between',
-    alignItems: 'space-between',
+    alignItems: 'flex-start',
   },
   imgProfile: {
     height: 50,
@@ -354,7 +351,8 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   form: {
-    flex: 1,
+    width: Dimensions.get('window').width,
+    paddingRight: 10,
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',

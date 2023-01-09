@@ -62,7 +62,7 @@ const Follows = ({ navigation, route, getFollows }) => {
   ) : (
     results.map((user) => {
       return (
-        <View style={styles.followsContent}>
+        <View style={styles.followsContent} key={user.id._id} >
           <TouchableOpacity
             style={styles.followsContent}
             onPress={() =>

@@ -55,7 +55,7 @@ export const Search = ({ navigation }) => {
   ) : (
     results.map((user) => {
       return (
-        <View style={styles.commentsContent}>
+        <View style={styles.commentsContent} key={user._id} >
           <TouchableOpacity
             style={styles.commentsContent}
             onPress={() =>

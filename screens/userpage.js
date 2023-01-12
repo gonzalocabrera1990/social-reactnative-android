@@ -307,21 +307,21 @@ const Userpage = (props) => {
                     justifyContent: 'center',
                     width: 50,
                     height: 50,
-                    backgroundColor: '#fff',
+                    backgroundColor: '#288818',
                     borderRadius: 50,
                   }}
                   onPress={() => openGaleryWall('imagen')}>
-                  <MaterialIcons
+                  <MaterialCommunityIcons
                     style={{
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      width: 50,
-                      height: 50,
-                      backgroundColor: '#288818',
-                      borderRadius: 50,
+                      // width: 50,
+                      // height: 50,
+                      // backgroundColor: '#288818',
+                      // borderRadius: 50,
                     }}
-                    name="add-a-photo"
+                    name="camera"
                     size={24}
                     color="black"
                   />
@@ -333,7 +333,7 @@ const Userpage = (props) => {
                     justifyContent: 'center',
                     width: 50,
                     height: 50,
-                    backgroundColor: '#fff',
+                    backgroundColor: '#288818',
                     borderRadius: 50,
                   }}
                   onPress={() => openGaleryWall('video')}>
@@ -342,10 +342,7 @@ const Userpage = (props) => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      width: 50,
-                      height: 50,
-                      backgroundColor: '#288818',
-                      borderRadius: 50,
+                  
                     }}
                     name="video-vintage"
                     size={24}
@@ -359,21 +356,12 @@ const Userpage = (props) => {
                     justifyContent: 'center',
                     width: 50,
                     height: 50,
-                    backgroundColor: '#fff',
+                    backgroundColor: '#288818',
                     borderRadius: 50,
                   }}
                   onPress={() => openGaleryWall('story')}>
-                  <MaterialCommunityIcons
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      width: 50,
-                      height: 50,
-                      backgroundColor: '#288818',
-                      borderRadius: 50,
-                    }}
-                    name="record-circle-outline"
+                  <MaterialIcons
+                    name="camera"
                     size={24}
                     color="white"
                   />

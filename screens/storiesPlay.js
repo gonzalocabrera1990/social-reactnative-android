@@ -69,7 +69,6 @@ const StoriesPlay = (props) => {
     setIndexDisplayStory(currentIndex);
 
     let getDuration = !fixCurrent ? null : fixCurrent[0].duration;
-    console.log("time", !fixCurrent ? null : fixCurrent[0].duration);
     setIndexTime(getDuration);
   }, [props.route.params]);
 
@@ -128,7 +127,6 @@ const StoriesPlay = (props) => {
   };
 
   let videoEnd = (last, index, img) => {
-    console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
     let gettime;
     // if (!view)
     //   props
@@ -206,7 +204,6 @@ const StoriesPlay = (props) => {
         },
       }).duration(indexTime);
       if (index == indexDisplayStory) {
-        console.log(indexTime);
         let ext =
           allDisplayStory[indexDisplayStory][nextIndex].filename.split('.');
         return (

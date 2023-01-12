@@ -26,9 +26,9 @@ import {
 } from '../redux/ActionCreators';
 import * as ActionTypes from '../redux/ActionTypes';
 
-
 // import AuthLoadingScreen from '../components/AuthLoadingScreen';
 import { connect, useDispatch } from 'react-redux';
+import { baseUrl } from '../shared/baseurl';
 
 const mapStateToProps = (state) => {
   return {
@@ -93,6 +93,7 @@ const MainStack = (props) => {
       dispatch(res);
     })
     .catch(error => console.error(error))
+    
    }, []);
 
   return (

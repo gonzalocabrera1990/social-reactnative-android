@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ActionTypes from './ActionTypes';
 import { baseUrl } from '../shared/baseurl';
 
+
 export const checkToken = () => async (dispatch) => {
   dispatch(tokenLoading());
   const tok = await AsyncStorage.getItem('token');
@@ -155,7 +156,8 @@ export const receiveLogout = () => {
 //INBOX
 export const inboxFetch = () => async (dispatch) => {
   dispatch(inboxLoading());
-  const QUERY = JSON.parse(AsyncStorage.getItem('id'));
+  const id = await AsyncStorage.getItem('id');
+  const QUERY = JSON.parse(id);
   const tok = await AsyncStorage.getItem('token');
   const token = JSON.parse(tok);
   const bearer = `Bearer ${token}`;
@@ -340,7 +342,7 @@ export const fetchStart = () => async (dispatch) => {
         dispatch(addStart(start));
         dispatch(fetchNotifications());
       })
-      // .then(start => dispatch(inboxFetch()))
+      .then(start => dispatch(inboxFetch()))
       .catch((error) => dispatch(startFailed(error.message)))
   );
 };
@@ -1525,3 +1527,37 @@ export const inboxFollowsError = (message) => {
     ERR: message
   };
 };
+
+// export const socketConnection = (io) => async (dispatch) => {
+//   dispatch(socketIOLoading());
+  
+//   const socket = await io(baseUrl);
+//   dispatch(socketIOSuccess(socket));
+//     // .then((response) => response.json())
+//     // .then((inboxFollows) => {
+//     //   // const message = inbox.some((i) =>
+//     //   //   i.talk.some((t) => t.author !== QUERY && t.seen === false)
+//     //   // );
+//     //   dispatch(socketIOSuccess(inboxFollows));
+//     // })
+//     // .catch((error) => dispatch(socketIOError(error.message)));
+// };
+// export const socketIOLoading = () => {
+//   return {
+//     type: ActionTypes.SOCKETIO_LOADING,
+//   };
+// };
+
+// export const socketIOSuccess = (socket) => {
+//   return {
+//     type: ActionTypes.SOCKETIO_SUCCESS,
+//     payload: socket
+//   };
+// };
+
+// export const socketIOError = (error) => {
+//   return {
+//     type: ActionTypes.SOCKETIO_ERROR,
+//     errMess: error
+//   };
+// };

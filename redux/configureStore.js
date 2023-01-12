@@ -14,6 +14,7 @@ import { Imagen } from './imagen';
 import { Likes } from './likes';
 import { Stories } from './stories';
 import { MessageUpdate } from './messageUpdate';
+//import { SocketConnection } from './socketConnection';
 
 import thunk from "redux-thunk";
 
@@ -35,6 +36,7 @@ export const ConfigureStore = () => {
       likes: Likes,
       stories: Stories,
       messageUpdate: MessageUpdate
+      //socketConnection: SocketConnection
     }),
 applyMiddleware(thunk)
   );

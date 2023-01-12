@@ -59,7 +59,6 @@ const StoriesPlay = (props) => {
     let fixCurrent = !allStories
       ? null
       : allStories.filter((h) => h[0].userData._id === id)[0];
-      console.log('fixCurrent', fixCurrent);
     setCurrentDisplayStory(fixCurrent);
     //get user index
     let currentIndex = !allStories

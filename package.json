@@ -30,7 +30,8 @@
     "@expo/webpack-config": "^0.17.2",
     "react-native-svg": "13.4.0",
     "expo-image-picker": "~14.0.2",
-    "socket.io-client": "^2.3.0"
+    "socket.io-client": "^2.3.0",
+    "@react-native-community/datetimepicker": "6.5.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

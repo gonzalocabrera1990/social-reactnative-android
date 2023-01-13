@@ -118,7 +118,7 @@ const MProfile = ({ navigation, route, messageUpdate, commentsPost, fetchComment
           name="keyboard-backspace"
           size={35}
           color={'green'}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.goBack("ImageWall")}
         />
       </View>
       <SafeAreaView style={styles.saveAreaViewContainer}>

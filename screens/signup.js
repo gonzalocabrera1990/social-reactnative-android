@@ -8,9 +8,11 @@ import {
   Dimensions,
   TouchableOpacity,
   ActivityIndicator,
+  Platform
 } from 'react-native';
 const { width } = Dimensions.get('window');
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 
 import SelectDropdown from 'react-native-select-dropdown';
 import { useFocusEffect } from '@react-navigation/native';
@@ -41,12 +43,17 @@ export const Signup = ({ navigation, signup, signupUser }) => {
     country: '',
     date: '',
   });
-
   const [isLodaing, setIsloading] = useState(false);
   const [touched, setTouched] = useState({
     password: false,
     username: false,
   });
+
+  const [date, setDate] = useState(new Date());
+  const [show, setShow] = useState(false);
+  const [text, setText] = useState('');
+  const [mode, setMode] = useState('date');
+
   useEffect(() => {
     if (signup.errMess) {
       setMessageResponse(signup.errMess);
@@ -64,6 +71,30 @@ export const Signup = ({ navigation, signup, signupUser }) => {
       };
     }, [])
   );
+
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShow(false);
+    setDate(currentDate);
+    let tempDate = new Date(currentDate)
+    let fDate = `${tempDate.getDate()}/${tempDate.getMonth() + 1}/${tempDate.getFullYear()}`
+    setText(fDate)
+    setDataForm((prevProps) => ({
+      ...prevProps,
+      date: fDate
+    }));
+  };
+  const showMode = (currentMode) => {
+    if (Platform.OS === 'android') {
+      setShow(true);
+      // for iOS, add a button that closes the picker
+    }
+    setMode(currentMode);
+  };
+
+  const showDatepicker = () => {
+    showMode('date');
+  };
   //  const countries = [
   //   'Egypt',
   //   'Canada',
@@ -78,6 +109,15 @@ export const Signup = ({ navigation, signup, signupUser }) => {
   //   'France',
   //   'India',
   // ];
+  // const showMode = (currentMode) => {
+  //   DateTimePickerAndroid.open({
+  //     value: date,
+  //     onChange,
+  //     mode: currentMode
+  //   });
+  // };
+
+
 
   const handleBlur = (field) => (e) => {
     setTouched((prevProps) => ({
@@ -159,14 +199,15 @@ export const Signup = ({ navigation, signup, signupUser }) => {
   );
   const enableButton =
     error.username.valid &&
-    error.password.valid &&
-    error.repeatpassword.valid &&
-    error.gender &&
-    error.date &&
-    error.country
+      error.password.valid &&
+      error.repeatpassword.valid &&
+      error.gender &&
+      error.date &&
+      error.country
       ? false
       : true;
-
+  console.log(enableButton)
+  console.log(date)
   return (
     <View style={styles.container}>
       {isLodaing ? (
@@ -273,15 +314,27 @@ export const Signup = ({ navigation, signup, signupUser }) => {
               </View>
               <View style={styles.inputContainer}>
                 <TextInput
-                  onChangeText={(text) =>
-                    setDataForm((prevProps) => ({
-                      ...prevProps,
-                      date: text,
-                    }))
-                  }
+                  // onChangeText={(text) =>
+                  //   setDataForm((prevProps) => ({
+                  //     ...prevProps,
+                  //     date: text,
+                  //   }))
+                  // }
+                  onChangeText={setDate}
+                  value={text}
+                  onTouchStart={showDatepicker}
                   style={styles.allinputs}
                   placeholder="Birth Ej: 01/01/1900"
                 />
+                {show && (
+                  <DateTimePicker
+                    testID="dateTimePicker"
+                    value={date}
+                    mode={mode}
+                    is24Hour={true}
+                    onChange={onChange}
+                  />
+                )}
               </View>
               <View style={styles.inputContainer}>
                 <SelectDropdown
@@ -320,8 +373,9 @@ export const Signup = ({ navigation, signup, signupUser }) => {
               </View>
             </View>
             <View>
-              <TouchableOpacity disabled={enableButton}>
+              <TouchableOpacity >
                 <Button
+                  disabled={enableButton}
                   color="green"
                   title="SIGN UP"
                   onPress={() => {

@@ -6,6 +6,8 @@ import {
   Button,
   TextInput,
   Switch,
+  Pressable,
+  Modal
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
@@ -29,6 +31,7 @@ const Settings = (props) => {
     status: '',
   });
   const [isEnabled, setIsEnabled] = React.useState(false);
+  const [isModalOpen, setIsModalOpen] = React.useState(false)
   const toggleSwitch = () => {
     setDataForm((prevProps) => ({
       ...prevProps,
@@ -41,14 +44,15 @@ const Settings = (props) => {
     let status = !user ? false : user.publicStatus;
     let modalStatus = !user
       ? null
-      : user.firstname === '' && user.lastname === ''
-      ? true
-      : false;
+      : user.firstname === "" && user.lastname === ""
+        ? true
+        : false;
     setDataForm((prevState) => ({
       ...prevState,
       status: status,
     }));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    setIsModalOpen(modalStatus)
+  }, [props.user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // const controlState = (e) => {
   //   let name = e.target.name;
@@ -141,6 +145,32 @@ const Settings = (props) => {
           />
         </View>
       </View>
+      <View style={styles.centeredView}>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isModalOpen}
+          onRequestClose={() => {
+            setIsModalOpen(!isModalOpen);
+          }}
+        >
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>
+                Please, fill in your personal information before browsing LandScape App.
+              </Text>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => {
+                  setIsModalOpen(!isModalOpen)
+                }}
+              >
+                <Text style={styles.textStyle}>Hide Modal</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+      </View>
     </View>
   );
 };
@@ -182,5 +212,48 @@ const styles = StyleSheet.create({
     left: 0,
     zIndex: 1,
   },
+    //MODAL
+    centeredView: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      marginTop: 22,
+      zIndex: 10
+    },
+    modalView: {
+      margin: 20,
+      backgroundColor: "white",
+      borderRadius: 20,
+      padding: 35,
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5
+    },
+    button: {
+      borderRadius: 20,
+      padding: 10,
+      elevation: 2
+    },
+    buttonOpen: {
+      backgroundColor: "#F194FF",
+    },
+    buttonClose: {
+      backgroundColor: "#2196F3",
+    },
+    textStyle: {
+      color: "white",
+      fontWeight: "bold",
+      textAlign: "center"
+    },
+    modalText: {
+      marginBottom: 15,
+      textAlign: "center"
+    }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(Settings);

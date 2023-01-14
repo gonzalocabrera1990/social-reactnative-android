@@ -291,7 +291,8 @@ const RenderItem = ({
               onPress={() =>
                 navigation.navigate('MsProfile', {
                   imgId: item._id,
-                  myUserId: userpage._id
+                  myUserId: userpage._id,
+                  localId: user._id
                 })
               }>
               <MaterialCommunityIcons

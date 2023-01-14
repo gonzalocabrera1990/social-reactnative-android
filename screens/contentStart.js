@@ -1,9 +1,12 @@
+import React, { useEffect, useState } from 'react';
 import {
   Text,
   View,
-  Button,
+  Dimensions,
   ScrollView,
   ActivityIndicator,
+  StyleSheet,
+  Image
 } from 'react-native';
 
 import { connect } from 'react-redux';
@@ -16,7 +19,10 @@ import {
 import { StartImage } from '../components/StartImage';
 import { StartVideo } from '../components/StartVideo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useState } from 'react';
+
+//import NoContent from '../shared/assets/images/start.png';
+const {width, height} = Dimensions.get('window');
+
 
 const mapStateToProps = (state) => {
   return {
@@ -50,14 +56,11 @@ const StartContent = (props) => {
   const [ID, setId] = useState('');
 
   useEffect(() => {
-    props.fetchStart();
-  }, []);
-  useEffect(() => {
     async function saveId() {
       let idA = await AsyncStorage.getItem('id');
       setId(idA);
     }
-    setContent(props.start);
+    if(props.start) setContent(props.start);
     saveId();
   }, [props.start]);
 
@@ -160,7 +163,13 @@ const StartContent = (props) => {
     });
   };
 
-  if (content) {
+  if (!content) {
+    return (
+      <View>
+        <ActivityIndicator size="large" color="#00ff00" />
+      </View>
+    );
+  } else if (content) {
     let imgs = content
       ? content.map((i) => {
         let imgOrVideo = i.imageId;
@@ -192,12 +201,30 @@ const StartContent = (props) => {
       })
       : null;
     return <ScrollView>{imgs}</ScrollView>;
-  } else {
+
+  } else if (content.length === 0) {
     return (
-      <View>
-        <ActivityIndicator size="large" color="#00ff00" />
+      <View style={styles.imagina}>
+        <Image
+          //src={NoContent}
+          source={require('../shared/assets/images/start.png')}
+          style={{width}}
+        />
+        <Text style={styles.description} >Follow other users and see their content here.</Text>
       </View>
-    );
+    )
   }
 };
+const styles = StyleSheet.create({
+  imagina: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    width, height,
+    backgroundColor: '#d7f8c8'
+  },
+  description:{
+    fontSize: 18
+  }
+})
 export default connect(mapStateToProps, mapDispatchToProps)(StartContent);

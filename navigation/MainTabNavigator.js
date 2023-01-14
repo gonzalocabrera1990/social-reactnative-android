@@ -16,7 +16,7 @@ import Follows from '../screens/follows';
 import Notifications from '../screens/notifications';
 import StoriesPlay from '../screens/storiesPlay';
 import Settings from '../screens/settings';
-import { Start } from '../screens/start';
+import Start from '../screens/start';
 import { Poster } from '../screens/poster';
 import Userpage from '../screens/userpage';
 import Users from '../screens/users';

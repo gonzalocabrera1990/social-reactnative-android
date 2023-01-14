@@ -206,8 +206,6 @@ export const Signup = ({ navigation, signup, signupUser }) => {
       error.country
       ? false
       : true;
-  console.log(enableButton)
-  console.log(date)
   return (
     <View style={styles.container}>
       {isLodaing ? (

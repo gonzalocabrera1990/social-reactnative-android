@@ -76,14 +76,10 @@ class HomeScreen extends React.Component {
       password: this.state.password,
     };
 
-    this.props.loginUser(creds);
-    // .then((result) => {
-    //   console.log("result", result);
-    //   // const pushAction = StackActions.push({
-    //   //   routeName: 'Home'
-    //   // })
-    //   // this.props.navigation.dispatch(pushAction);
-    //})
+    this.props.loginUser(creds)
+    .then(resp =>{
+      if(resp) this.props.navigation.navigate("Settings")
+    })
   };
 
   map = (a) => {};

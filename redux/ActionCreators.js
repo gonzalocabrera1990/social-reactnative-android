@@ -52,6 +52,7 @@ export const userCheck = () => ({
 
 export const loginUser = (creds) => (dispatch) => {
   // We dispatch requestLogin to kickoff the call to the API
+  dispatch(userLoading());
   dispatch(requestLogin(creds));
   AsyncStorage.clear();
   return fetch(baseUrl + 'users/login', {
@@ -107,11 +108,11 @@ export const loginUser = (creds) => (dispatch) => {
         dispatch(fetchFollowing());
         // dispatch(fetchFollowers());
 
-        // if(!name && !lastname){
-        //   return new Promise((resolve,reject) =>{
-        //     resolve(true);
-        //   });
-        // }
+        if(!name && !lastname){
+          return new Promise((resolve,reject) =>{
+            resolve(true);
+          });
+        }
       } else {
         var error = new Error('Error ' + response.status);
         error.response = response;

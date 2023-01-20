@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   Text,
   View,
@@ -9,9 +9,11 @@ import {
   Pressable,
   Modal
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import { logoutUser, settingsUser } from '../redux/ActionCreators';
+import { SocketContext } from '../components/contextSocketIO';
 const mapStateToProps = (state) => {
   return {
     auth: state.auth,
@@ -32,13 +34,22 @@ const Settings = (props) => {
   });
   const [isEnabled, setIsEnabled] = React.useState(false);
   const [isModalOpen, setIsModalOpen] = React.useState(false)
+  const [ID, setId] = useState('');
+  const { socket } = useContext(SocketContext)
+
   const toggleSwitch = () => {
     setDataForm((prevProps) => ({
       ...prevProps,
       status: !dataForm.status,
     }));
   };
-
+  useEffect(() => {
+    (async function () {
+      let idA = await AsyncStorage.getItem('id');
+      let idParse = JSON.parse(idA)
+      setId(idParse);
+    })()
+  }, [])
   useEffect(() => {
     let user = !props.user ? null : props.user.user;
     let status = !user ? false : user.publicStatus;
@@ -54,6 +65,10 @@ const Settings = (props) => {
     setIsModalOpen(modalStatus)
   }, [props.user]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const logOut = () => {
+    socket.emit("removeLogin",ID)
+    props.logoutUser()
+  }
   // const controlState = (e) => {
   //   let name = e.target.name;
   //   if (name === 'status') {
@@ -141,7 +156,7 @@ const Settings = (props) => {
             name="logout"
             size={35}
             color={'green'}
-            onPress={props.logoutUser}
+            onPress={logOut}
           />
         </View>
       </View>

@@ -44,6 +44,8 @@ const RenderItemVid = ({
   const [iLikeIt, setILikeIt] = useState('black');
   const [ID, setId] = useState('');
   const [status, setStatus] = useState({});
+  const [error, setError] = useState(null);
+
   let playVideo = React.createRef();
   useEffect(() => {
     (async function () {
@@ -59,7 +61,7 @@ const RenderItemVid = ({
         setComments(comm);
       })
       .catch((error) => setError(error.message));
- 
+
   }, [user]);
   async function fetchLikes(id) {
     const tok = await AsyncStorage.getItem('token');
@@ -119,13 +121,13 @@ const RenderItemVid = ({
         />
       </View>
       <View style={styles.imageContent}>
-      <TouchableOpacity style={status.isPlaying ? styles.iconPause : styles.iconPlay } onPress={() =>
+        <TouchableOpacity style={status.isPlaying ? styles.iconPause : styles.iconPlay} onPress={() =>
           status.isPlaying ? playVideo.current.pauseAsync() : playVideo.current.playAsync()
         }>
           <MaterialCommunityIcons name="play" size={50} color={status.isPlaying ? 'transparent' : 'green'} />
         </TouchableOpacity>
         <Video
-        ref={playVideo}
+          ref={playVideo}
           source={{ uri: `${baseUrl}${item.filename}` }}
           key={item._id}
           resizeMode="contain"
@@ -138,37 +140,41 @@ const RenderItemVid = ({
       </View>
       <View style={styles.info}>
         <View>
-          {likes.length > 1 ? (
-            <TouchableOpacity
-              style={styles.user}
-              onPress={() =>
-                navigation.navigate('Likes', {
-                  localId: JSON.parse(idUser),
-                  likes: likes,
-                })
-              }>
-              <Text style={styles.padding}>
-                A {likes.length} personas le gusta.
-              </Text>
-            </TouchableOpacity>
-          ) : likes.length == 1 ? (
-            <TouchableOpacity
-              style={styles.user}
-              onPress={() =>
-                navigation.navigate('Likes', {
-                  localId: JSON.parse(idUser),
-                  likes: likes,
-                })
-              }>
-              <Text style={styles.padding}>
-                A {likes.length} persona le gusta.
-              </Text>
-            </TouchableOpacity>
-          ) : (
-            <Text style={styles.padding}>
-              Se el primero en marcar Me Gusta.
-            </Text>
-          )}
+          {
+            !likes.length ?
+              null
+              :
+              likes.length > 1 ? (
+                <TouchableOpacity
+                  style={styles.user}
+                  onPress={() =>
+                    navigation.navigate('Likes', {
+                      localId: JSON.parse(idUser),
+                      likes: likes,
+                    })
+                  }>
+                  <Text style={styles.padding}>
+                    A {likes.length} personas le gusta.
+                  </Text>
+                </TouchableOpacity>
+              ) : likes.length == 1 ? (
+                <TouchableOpacity
+                  style={styles.user}
+                  onPress={() =>
+                    navigation.navigate('Likes', {
+                      localId: JSON.parse(idUser),
+                      likes: likes,
+                    })
+                  }>
+                  <Text style={styles.padding}>
+                    A {likes.length} persona le gusta.
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <Text style={styles.padding}>
+                  Se el primero en marcar Me Gusta.
+                </Text>
+              )}
         </View>
         <View style={styles.form}>
           <View>
@@ -307,22 +313,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    top:0,
+    top: 0,
     right: 0,
     left: 0,
     bottom: 0,
-    zIndex:10
+    zIndex: 10
   },
   iconPlay: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    top:0,
+    top: 0,
     right: 0,
     left: 0,
     bottom: 0,
-    zIndex:10,
+    zIndex: 10,
     color: 'transparent'
   },
   info: {

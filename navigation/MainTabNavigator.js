@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -25,7 +25,7 @@ import {
   checkToken
 } from '../redux/ActionCreators';
 import * as ActionTypes from '../redux/ActionTypes';
-
+import { SocketContext } from '../components/contextSocketIO';
 // import AuthLoadingScreen from '../components/AuthLoadingScreen';
 import { connect, useDispatch } from 'react-redux';
 import { baseUrl } from '../shared/baseurl';
@@ -34,6 +34,8 @@ const mapStateToProps = (state) => {
   return {
     auth: state.auth,
     user: state.user,
+    notifications: state.notifications,
+    inbox: state.inbox
   };
 };
 
@@ -44,9 +46,14 @@ const Stack = createBottomTabNavigator();
 // const auth = this.props.auth.auth.isAuthenticated;
 // console.log("navbar", auth);
 const MainStack = (props) => {
+  const [notificationsBadge, setNotificationsBadge] = useState(null)
+  const [inboxBadge, setInboxBadge] = useState(null)
+  const { socket } = useContext(SocketContext)
+
   const dispatch = useDispatch();
+
   useEffect(() => {
-   
+
     // async function payload() {
     //    const tokP = await AsyncStorage.getItem('token');
     //    const userP = await AsyncStorage.getItem('creds');
@@ -66,11 +73,11 @@ const MainStack = (props) => {
     //       }
     //     });
     //    }
-       
+
     //  }
     //  payload();
     //  props.checkToken()
-     async function payload() {
+    async function payload() {
       const tokP = await AsyncStorage.getItem('token');
       const userP = await AsyncStorage.getItem('creds');
       const idP = await AsyncStorage.getItem('id');
@@ -78,24 +85,67 @@ const MainStack = (props) => {
       const user = !userP ? null : JSON.parse(userP);
       const id = !idP ? null : JSON.parse(idP);
       return {
-       type: ActionTypes.RELOAD_AUTH,
-       payload: {
-         isAuthenticated: tok ? true : false,
-         token: tok,
-         user: user,
-         id: id,
-         isLoading: false
-       }
-     }
+        type: ActionTypes.RELOAD_AUTH,
+        payload: {
+          isAuthenticated: tok ? true : false,
+          token: tok,
+          user: user,
+          id: id,
+          isLoading: false
+        }
+      }
     }
     payload()
-    .then(res => {
-      dispatch(res);
-    })
-    .catch(error => console.error(error))
-    
-   }, []);
+      .then(res => {
+        dispatch(res);
+      })
+      .catch(error => console.error(error))
 
+  }, []);
+
+  useEffect(() => {
+    const notiResults = props.notifications.results;
+    let notiCount = 0;
+    for (let i = 0; i < notiResults.length; i++) {
+      if (notiResults[i].readstatus === false) {
+        notiCount++
+      }
+    }
+    if (notiCount > 0) setNotificationsBadge(notiCount)
+
+  }, [props.notifications.results])
+  useEffect(() => {
+    async function inboxes() {
+      let id = await AsyncStorage.getItem('id');
+      if (id) {
+        const QUERY = JSON.parse(id);
+        const inboxResults = !props.inbox.inbox ? [] : props.inbox.inbox;
+        let inboxCount = 0;
+        for (let i = 0; i < inboxResults.length; i++) {
+          const message = inboxResults[i].talk.some(t => t.author !== QUERY && t.seen === false)
+          console.log("message", message);
+          //const message = inboxResults.some(i => i.talk.some(t => t.author !== QUERY && t.seen === false))
+          if (message) {
+            inboxCount++
+          }
+        }
+        return inboxCount
+      }
+    }
+    inboxes()
+      .then((count) => {
+        if (count > 0) setInboxBadge(count)
+      })
+  }, [props.inbox.inbox])
+  
+  useEffect(() => {
+    const name = !props.user.user ? null : props.user.user.username
+    const id = !props.user.user ? null : props.user.user._id
+    socket.on("chatNotification", data => {
+      setInboxBadge(inboxBadge + 1)
+    })
+    if (name && id) socket.emit("username", { id, name })
+  }, [socket, props.user.user])
   return (
     <Stack.Navigator
       screenOptions={({ route }) => ({
@@ -126,141 +176,148 @@ const MainStack = (props) => {
     >
       {
         props.auth.isLoading &&
-      props.user.isLoading ? (
-         <Stack.Screen
+          props.user.isLoading ? (
+          <Stack.Screen
             name="Poster"
             component={Poster}
             options={{
               tabBarButton: () => null,
               tabBarStyle: { display: 'none' },
             }}
-          /> 
+          />
         )
-      :
-        !props.auth.isAuthenticated ? 
-         
-      (
-        <>
-        <Stack.Screen
-          name="LogIn"
-          component={HomeScreen}
-          options={{
-            tabBarStyle: { display: 'none' },
-          }}
-        />
-          <Stack.Screen
-            name="Signup"
-            component={Signup}
-            options={{
-              tabBarButton: () => null,
-              tabBarStyle: { display: 'none' },
-            }}
-          />
-        </>
-      )
-        
-        :
-        props.auth.isAuthenticated ?
-        (
-        <>
-          <Stack.Screen name="Home" component={Start} />
-          <Stack.Screen name="Profile" component={Userpage} />
-          <Stack.Screen
-            options={{ tabBarBadge: 3 }}
-            name="Inbox"
-            component={Inbox}
-          />
-          <Stack.Screen name="Notifications" component={Notifications} />
-          <Stack.Screen name="Search" component={Search} />
-          <Stack.Screen
-            name="ImageWall"
-            component={ImageWall}
-            options={{
-              tabBarButton: () => null,
-            }}
-          />
-          <Stack.Screen
-            name="Settings"
-            component={Settings}
-            options={{
-              tabBarButton: () => null,
-            }}
-          />
-          <Stack.Screen
-            name="RenderItem"
-            component={RenderItem}
-            options={{
-              tabBarButton: () => null,
-              tabBarStyle: { display: 'none' },
-            }}
-          />
-          <Stack.Screen
-            name="RenderItemVid"
-            component={RenderItemVid}
-            options={{
-              tabBarButton: () => null,
-              tabBarStyle: { display: 'none' },
-            }}
-          />
-          <Stack.Screen
-            name="MsProfile"
-            component={MProfile}
-            options={{
-              tabBarButton: () => null,
-              tabBarStyle: { display: 'none' },
-            }}
-          />
-          <Stack.Screen
-            name="Messages"
-            component={Messages}
-            options={{
-              tabBarButton: () => null,
-              tabBarStyle: { display: 'none' },
-            }}
-          />
-          <Stack.Screen
-            name="Follows"
-            component={Follows}
-            options={{
-              tabBarButton: () => null,
-              tabBarStyle: { display: 'none' },
-            }}
-          />
-          <Stack.Screen
-            name="Likes"
-            component={Likes}
-            options={{
-              tabBarButton: () => null,
-              tabBarStyle: { display: 'none' },
-            }}
-          />
-          <Stack.Screen
-            name="ImageProfile"
-            component={ImageProfile}
-            options={{
-              tabBarButton: () => null,
-              tabBarStyle: { display: 'none' },
-            }}
-          />
-          <Stack.Screen
-            name="Users"
-            component={Users}
-            options={{
-              tabBarButton: () => null,
-            }}
-          />
-          <Stack.Screen
-            name="StoriesPlay"
-            component={StoriesPlay}
-            options={{
-              tabBarButton: () => null,
-              tabBarStyle: { display: 'none' },
-            }}
-          />
-        </>
-      ) 
-      : null
-       }
+          :
+          !props.auth.isAuthenticated ?
+
+            (
+              <>
+                <Stack.Screen
+                  name="LogIn"
+                  component={HomeScreen}
+                  options={{
+                    tabBarStyle: { display: 'none' },
+                  }}
+                />
+                <Stack.Screen
+                  name="Signup"
+                  component={Signup}
+                  options={{
+                    tabBarButton: () => null,
+                    tabBarStyle: { display: 'none' },
+                  }}
+                />
+              </>
+            )
+
+            :
+            props.auth.isAuthenticated ?
+              (
+                <>
+                  <Stack.Screen name="Home" component={Start} />
+                  <Stack.Screen name="Profile" component={Userpage} />
+                  <Stack.Screen
+                    options={inboxBadge ? { tabBarBadge: inboxBadge } : null}
+                    //or
+                    //options={{ tabBarBadge: inboxBadge }}
+                    name="Inbox"
+                    component={Inbox}
+                  />
+                  <Stack.Screen
+                    options={notificationsBadge ? { tabBarBadge: notificationsBadge } : null}
+                    //or
+                    //options={{ tabBarBadge: notificationsBadge }}
+                    name="Notifications"
+                    component={Notifications} />
+                  <Stack.Screen name="Search" component={Search} />
+                  <Stack.Screen
+                    name="ImageWall"
+                    component={ImageWall}
+                    options={{
+                      tabBarButton: () => null,
+                    }}
+                  />
+                  <Stack.Screen
+                    name="Settings"
+                    component={Settings}
+                    options={{
+                      tabBarButton: () => null,
+                    }}
+                  />
+                  <Stack.Screen
+                    name="RenderItem"
+                    component={RenderItem}
+                    options={{
+                      tabBarButton: () => null,
+                      tabBarStyle: { display: 'none' },
+                    }}
+                  />
+                  <Stack.Screen
+                    name="RenderItemVid"
+                    component={RenderItemVid}
+                    options={{
+                      tabBarButton: () => null,
+                      tabBarStyle: { display: 'none' },
+                    }}
+                  />
+                  <Stack.Screen
+                    name="MsProfile"
+                    component={MProfile}
+                    options={{
+                      tabBarButton: () => null,
+                      tabBarStyle: { display: 'none' },
+                    }}
+                  />
+                  <Stack.Screen
+                    name="Messages"
+                    component={Messages}
+                    options={{
+                      tabBarButton: () => null,
+                      tabBarStyle: { display: 'none' },
+                    }}
+                  />
+                  <Stack.Screen
+                    name="Follows"
+                    component={Follows}
+                    options={{
+                      tabBarButton: () => null,
+                      tabBarStyle: { display: 'none' },
+                    }}
+                  />
+                  <Stack.Screen
+                    name="Likes"
+                    component={Likes}
+                    options={{
+                      tabBarButton: () => null,
+                      tabBarStyle: { display: 'none' },
+                    }}
+                  />
+                  <Stack.Screen
+                    name="ImageProfile"
+                    component={ImageProfile}
+                    options={{
+                      tabBarButton: () => null,
+                      tabBarStyle: { display: 'none' },
+                    }}
+                  />
+                  <Stack.Screen
+                    name="Users"
+                    component={Users}
+                    options={{
+                      tabBarButton: () => null,
+                    }}
+                  />
+                  <Stack.Screen
+                    name="StoriesPlay"
+                    component={StoriesPlay}
+                    options={{
+                      tabBarButton: () => null,
+                      tabBarStyle: { display: 'none' },
+                    }}
+                  />
+                </>
+              )
+              : null
+      }
     </Stack.Navigator>
   );
 };

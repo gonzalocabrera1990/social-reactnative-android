@@ -45,7 +45,7 @@ const Messages = ({ navigation, route, messageUpdate, commentsPost, fetchComment
   const [idMessageDelete, setIdMessageDelete] = useState(null);
   const [messagesLoading, setMessagesLoading] = useState(true);
   const [messagesLength, setMessagesLength] = useState(true);
-  
+
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [error, setError] = useState('');
   const [ID, setId] = useState('');
@@ -73,11 +73,11 @@ const Messages = ({ navigation, route, messageUpdate, commentsPost, fetchComment
     }, [route])
   );
 
- 
+
   const handleChangeMesssage = (text) => {
     setMessageInput(text);
-    if(text.length > 0 || text.length < 140) setMessagesLength(false)
-    if(text.length === 0 || text.length > 140) setMessagesLength(true)
+    if (text.length > 0 || text.length < 140) setMessagesLength(false)
+    if (text.length === 0 || text.length > 140) setMessagesLength(true)
   };
   // const fetchComments = () => {
   //   return fetch(baseUrl + `comments/get-comments-image/${route.params.imgId}`)
@@ -162,15 +162,15 @@ const Messages = ({ navigation, route, messageUpdate, commentsPost, fetchComment
     <View style={styles.activityIndicator}>
       <ActivityIndicator size="large" color="#00ff00" />
     </View>
-    : 
+    :
     messages[0] === undefined ?
       <>
         <Text style={styles.padding}>Sin comentarios todavia.</Text>
         <Text style={styles.padding}>Se el primero en comentar</Text>
       </>
-    :
-    (
-      messages.map((message) => {
+      :
+      (
+        messages.map((message) => {
           return (
             <View style={styles.commentsContent} key={message._id}>
               <View style={styles.commentsItems} >
@@ -186,30 +186,30 @@ const Messages = ({ navigation, route, messageUpdate, commentsPost, fetchComment
                     style={styles.imgProfile}
                     source={{ uri: `${baseUrl}${message.author.image.filename}` }}
                   />
-                    <Text style={styles.author}>{message.author.usuario}</Text>
+                  <Text style={styles.author}>{message.author.usuario}</Text>
                 </TouchableOpacity>
                 <Text style={styles.comments}>{message.comment}</Text>
               </View>
-{
-  message.author._id === route.params.myUserId ?
-              <TouchableOpacity
-              onPress={() =>{
-                setIsModalOpen(true)
-                setIdMessageDelete(message._id)
-                }}
-              >
-                <MaterialCommunityIcons
-                  name="delete-forever"
-                  size={15}
-                  color={'red'}
-                />
-              </TouchableOpacity>
-              : null
-      }
+              {
+                message.author._id === route.params.myUserId ?
+                  <TouchableOpacity
+                    onPress={() => {
+                      setIsModalOpen(true)
+                      setIdMessageDelete(message._id)
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name="delete-forever"
+                      size={15}
+                      color={'red'}
+                    />
+                  </TouchableOpacity>
+                  : null
+              }
             </View>
           )
-      })
-  );
+        })
+      );
 
 
   return (
@@ -245,55 +245,55 @@ const Messages = ({ navigation, route, messageUpdate, commentsPost, fetchComment
               </View>
               <View style={styles.sendButton}>
                 <MaterialCommunityIcons.Button
-                disabled={messagesLength}
+                  disabled={messagesLength}
                   style={styles.formItems}
                   name="email-mark-as-unread"
                   size={24}
                   color={messagesLength ? "gray" : "black"}
                   onPress={() => handleSubmit()}
-                  
+
                 />
               </View>
             </View>
           </View>
         </View>
         <View style={styles.centeredView}>
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={isModalOpen}
-          onRequestClose={() => {
-            setIsModalOpen(!isModalOpen);
-          }}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>
-                Are you sure that you want to delete this message?
-              </Text>
-              <View style={styles.pairOfButtons}>
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => {
-                  deleteComments();
-                }}
-              >
-                <Text style={styles.textStyle}>Delete</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={() => {
-                  setIsModalOpen(!isModalOpen);
-                }}
-              >
-                <Text style={styles.textStyle}>Cancel</Text>
-              </Pressable>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={isModalOpen}
+            onRequestClose={() => {
+              setIsModalOpen(!isModalOpen);
+            }}
+          >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Text style={styles.modalText}>
+                  Are you sure that you want to delete this message?
+                </Text>
+                <View style={styles.pairOfButtons}>
+                  <Pressable
+                    style={[styles.button, styles.buttonClose]}
+                    onPress={() => {
+                      deleteComments();
+                    }}
+                  >
+                    <Text style={styles.textStyle}>Delete</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.button, styles.buttonClose]}
+                    onPress={() => {
+                      setIsModalOpen(!isModalOpen);
+                    }}
+                  >
+                    <Text style={styles.textStyle}>Cancel</Text>
+                  </Pressable>
+                </View>
+              </View>
             </View>
-            </View>
-          </View>
-        </Modal>
-      </View>
-      
+          </Modal>
+        </View>
+
       </SafeAreaView>
 
     </View>
@@ -362,7 +362,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
     position: 'absolute',
     bottom: 25,
-    zIndex:10,
+    zIndex: 10,
     width
   },
   form: {
@@ -408,56 +408,56 @@ const styles = StyleSheet.create({
     paddingVertical: '0%',
     paddingBottom: '20%',
   },
-      //MODAL
-      centeredView: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 22,
-        zIndex: 10
-      },
-      modalView: {
-        margin: 20,
-        backgroundColor: "white",
-        borderRadius: 20,
-        padding: 35,
-        alignItems: "center",
-        shadowColor: "#000",
-        shadowOffset: {
-          width: 0,
-          height: 2
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5
-      },
-      button: {
-        borderRadius: 20,
-        padding: 10,
-        elevation: 2,
-        marginLeft: 10,
-        marginRight: 10
-      },
-      buttonOpen: {
-        backgroundColor: "#F194FF",
-      },
-      buttonClose: {
-        backgroundColor: "#2196F3",
-      },
-      textStyle: {
-        color: "white",
-        fontWeight: "bold",
-        textAlign: "center"
-      },
-      modalText: {
-        marginBottom: 15,
-        textAlign: "center"
-      },
-      pairOfButtons: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        alignItems: 'center'
-      }
+  //MODAL
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+    zIndex: 10
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+    marginLeft: 10,
+    marginRight: 10
+  },
+  buttonOpen: {
+    backgroundColor: "#F194FF",
+  },
+  buttonClose: {
+    backgroundColor: "#2196F3",
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center"
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: "center"
+  },
+  pairOfButtons: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center'
+  }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(Messages)

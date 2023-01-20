@@ -9,13 +9,15 @@ import {
   ScrollView,
   Image,
   TextInput,
-  ActivityIndicator
+  ActivityIndicator,
+  Keyboard
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SocketContext } from '../components/contextSocketIO';
 import {
-  getInboxFollows
+  getInboxFollows,
+  inboxFetch
 } from '../redux/ActionCreators';
 
 import { connect } from 'react-redux';
@@ -32,9 +34,10 @@ const mapStateToProps = (state) => {
   };
 };
 const mapDispatchToProps = (dispatch) => ({
-  getInboxFollows: () => dispatch(getInboxFollows())
+  getInboxFollows: () => dispatch(getInboxFollows()),
+  inboxFetch: () => dispatch(inboxFetch())
 });
-const Inbox = ({ inboxFollows, getInboxFollows, inbox }) => {
+const Inbox = ({ inboxFollows, getInboxFollows, inbox, inboxFetch }) => {
   const [talk, setTalk] = useState(null);
   const [usersInbox, setUsersInbox] = useState(null);
   const [inboxTalks, setInboxTalks] = useState(null);
@@ -42,6 +45,7 @@ const Inbox = ({ inboxFollows, getInboxFollows, inbox }) => {
   const [room, setRoom] = useState("");
   const [chatTitle, setChatTitle] = useState(null);
   const [messageInput, setMessageInput] = useState('');
+  const [messagesLength, setMessagesLength] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef(null);
   const scrollRef = useRef(null);
@@ -54,19 +58,33 @@ const Inbox = ({ inboxFollows, getInboxFollows, inbox }) => {
       let idParse = JSON.parse(idA)
       setId(idParse);
     })()
-    getInboxFollows();
   }, [])
 
   useEffect(() => {
-    setUsersInbox(inboxFollows)
     setInboxTalks(inbox)
+  }, [inbox])
+  useEffect(() => {
+    setUsersInbox(inboxFollows)
   }, [inboxFollows])
+
   useEffect(() => {
     socket.on("sendChat", data => {
       setTalk([data])
-      let filterInbox = !inbox ? [] : inbox
-      // let getinbox = filterInbox.some( i => i._id === data._id) ? null : handleInboxFetch()
-
+      if (room !== data.room) setRoom(data.room);
+      // let filterInbox = !inbox ? [] : inbox
+      let getinbox = !inboxTalks ? false : inboxTalks.some(i => i._id == data._id)
+      if (!getinbox) inboxFetch()
+      let getUser = data.members.userOne._id == ID ? data.members.userTwo._id : data.members.userOne._id
+      let getIndex = !usersInbox ? true : usersInbox.findIndex(f => f.id._id == getUser)
+      if (getIndex) getInboxFollows();
+      //setUserState(data);
+      setIsLoading(false)
+    })
+  }, [socket])
+  useEffect(() => {
+    socket.on("getChat", data => {
+      setTalk([data])
+      if (room !== data.room) setRoom(data.room);
       //setUserState(data);
       setIsLoading(false)
     })
@@ -74,38 +92,28 @@ const Inbox = ({ inboxFollows, getInboxFollows, inbox }) => {
 
   useFocusEffect(
     useCallback(() => {
+      getInboxFollows();
       return () => {
-        setRoom('');
         socket.emit("removeuser", ID);
+        setRoom('');
+        setMessageInput('');
+        setMessagesLength(true)
+        setTalk(null)
+        setChatTitle(null)
       };
     }, [])
   );
 
   const handleChangeMesssage = (text) => {
     setMessageInput(text);
+    if (text.length > 0 || text.length < 140) setMessagesLength(false)
+    if (text.length === 0 || text.length > 140) setMessagesLength(true)
   };
 
-  //   const setUserState = (data) => {
-  //     const localid = JSON.parse(ID)
-  //     const userOne = data.members.userOne
-  //     const userTwo = data.members.userTwo
-  //     const getChatTitle = {
-  //         id: {
-  //             _id: userOne._id === localid ? userTwo._id : userOne._id,
-  //             image: userOne._id === localid ? userTwo.image : userOne.image,
-  //             firstname: userOne._id === localid ? userTwo.firstname : userOne.firstname,
-  //             lastname: userOne._id === localid ? userTwo.lastname : userOne.lastname,
-  //             username: userOne._id === localid ? userTwo.username : userOne.username
-  //         }
-  //     }
-  //     setRoom(data.room)
-  //     setTalk([data])
-  //     setChatTitle(getChatTitle)
-  // }
-
   const handleSubmitInbox = () => {
-    const talkId = talk[0] ? talk[0]._id : ''
-    const RECEPTOR = chatTitle._id
+    Keyboard.dismiss();
+    const talkId = talk ? talk[0]._id : ''
+    const RECEPTOR = chatTitle.id._id
     const roomSocket = room
     const datad = {
       contenido: {
@@ -123,18 +131,12 @@ const Inbox = ({ inboxFollows, getInboxFollows, inbox }) => {
     }
     socket.emit('sendMessage', datad)
     setMessageInput('')
+    setMessagesLength(true)
     inputRef.current.clear()
   }
 
-  const setReceptor = (data) => {
-    let localUser = ID
-    let findTalk = data.members.userOne._id === localUser ? data.members.userTwo : data.members.userOne
-    // inboxTalks === null ? [] :
-    //   inboxTalks.filter(t => {//return complete chat with these conditions
-    //     return t.members.userOne._id === localUser && t.members.userTwo._id === frienid ?
-    //       t.members.userOne._id === localUser && t.members.userTwo._id === frienid :
-    //       t.members.userTwo._id === localUser && t.members.userOne._id === frienid
-    //   })
+  const setReceptor = (ids) => {
+    let findTalk = usersInbox.filter(user => user.id._id === ids)[0]
     setChatTitle(findTalk)
   }
 
@@ -161,6 +163,10 @@ const Inbox = ({ inboxFollows, getInboxFollows, inbox }) => {
 
     )
   })
+  //sacar el user del userInbox db cuando se crea una conversacion
+  //obtener los usuarios de una conversacion que no tenga el id local
+  //ordenar los usuarios de la segunda lista segun la reciente conversacion
+  //juntar las dos listas para la data del dropdown
 
   return (
     <SafeAreaView style={styles.saveAreaViewContainer}>
@@ -172,13 +178,18 @@ const Inbox = ({ inboxFollows, getInboxFollows, inbox }) => {
               data={usersInbox}
               onSelect={(selectedItem, index) => {
                 setIsLoading(true)
+                setTalk(null)
+                setMessageInput('');
+                setMessagesLength(true)
+                Keyboard.dismiss();
                 var ids = selectedItem.id._id
                 let charla = existChat(ids)
                 let result = charla[0] ? true : false
+                setReceptor(ids)
+                if (!result) setIsLoading(false)
                 //if exist a chat with these users fetch it
                 if (result) {
                   setRoom(charla[0].room)
-                  setReceptor(charla[0])
                   let room = charla[0].room
                   let query = charla[0]._id
                   let data = {
@@ -187,15 +198,40 @@ const Inbox = ({ inboxFollows, getInboxFollows, inbox }) => {
                   socket.emit("fetchChat", data);
                 }
               }}
-              defaultButtonText={'Select User'}
+
+              defaultButtonText={chatTitle ? `${chatTitle.id.firstname} ${chatTitle.id.lastname}` : 'Select User'}
               buttonTextAfterSelection={(selectedItem, index) => {
-                return `${selectedItem.id.firstname} ${selectedItem.id.lastname}`;
+                return (chatTitle ? `${chatTitle.id.firstname} ${chatTitle.id.lastname}` : 'Select User');
+                // return (
+                // <Text style={styles.aaa}>
+                //   {chatTitle.id.firstname} {chatTitle.id.lastname}
+                //   </Text>
+                //   );
               }}
-              rowTextForSelection={(item, index) => {
-                return `${item.id.firstname} ${item.id.lastname}`;
+
+              // rowTextForSelection={(item, index) => {
+              //   return `${item.id.firstname} ${item.id.lastname}`;
+              // }}
+              renderCustomizedRowChild={(item, index) => {
+                let inboxes = !item.inboxId ? null : item.inboxId
+                //let checkRead = !inboxes ? null : inboxes.talk[0].author !== ID && inboxes.talk[0].seen === false
+                let checkRead = !inboxes ? null : inboxes.talk.some(t => t.author !== ID && t.seen === false)
+                return (
+                  <View style={styles.rowDisplay}>
+                    <Text style={styles.nameRow}>{item.id.firstname} {item.id.lastname}</Text>
+                    <View style={checkRead ? styles.dropdown2RowStyleNewMessage : styles.dropdown2RowStyle}></View>
+                    {/* {selectedItem ? (
+                      <Image source={selectedItem.image} style={styles.dropdown3BtnImage} />
+                    ) : (
+                      <Ionicons name="md-earth-sharp" color={'#444'} size={32} />
+                    )}
+                    <Text style={styles.dropdown3BtnTxt}>{selectedItem ? selectedItem.title : 'Select country'}</Text>
+                    <FontAwesome name="chevron-down" color={'#444'} size={18} /> */}
+                  </View>
+                );
               }}
-              buttonStyle={styles.dropdown2BtnStyle}
-              buttonTextStyle={styles.dropdown2BtnTxtStyle}
+              buttonStyle={styles.dropdown2BtnStyle}//first view 
+              buttonTextStyle={styles.dropdown2BtnTxtStyle}//first view letters
               renderDropdownIcon={(isOpened) => {
                 return (
                   <MaterialCommunityIcons
@@ -206,9 +242,9 @@ const Inbox = ({ inboxFollows, getInboxFollows, inbox }) => {
                 );
               }}
               dropdownIconPosition={'right'}
-              dropdownStyle={styles.dropdown2DropdownStyle}
-              rowStyle={styles.dropdown2RowStyle}
-              rowTextStyle={styles.dropdown2RowTxtStyle}
+              dropdownStyle={styles.dropdown2DropdownStyle}//on press color
+              rowStyle={styles.dropdown2RowStyle}//each option button
+              rowTextStyle={styles.dropdown2RowTxtStyle}//each option button text
             />
         }
         <ScrollView
@@ -217,26 +253,32 @@ const Inbox = ({ inboxFollows, getInboxFollows, inbox }) => {
           ref={scrollRef}
           onContentSizeChange={() => scrollRef.current.scrollToEnd({ animated: true })}
         >
-          {!talk ? (
-            <Text>Pick a user to init a conversation</Text>
-          ) : isLoading ? (
+          {isLoading ? (
             <View >
               <ActivityIndicator size="large" color="#00ff00" />
             </View>
-          )
-            :
-            (
-              MESSAGES
-            )}
+          ) :
+            !talk && !chatTitle ? (
+              <Text>Pick a user to init a conversation</Text>
+            )
+              :
+              !talk && chatTitle ?
+                <>
+                  <Text>Be the first to init a conversation with {`${chatTitle.id.firstname} ${chatTitle.id.lastname}`}</Text>
+                </> :
+                (
+                  MESSAGES
+                )}
 
         </ScrollView>
         <View style={styles.formPosition}>
-          {!talk ? null : (
+          {!talk && !chatTitle ? null : (
             <View style={styles.form}>
               <View
                 style={styles.inputMessage}>
                 <TextInput
                   ref={inputRef}
+                  value={messageInput}
                   type="email"
                   placeholder="Message"
                   onChangeText={(text) => handleChangeMesssage(text)}
@@ -244,10 +286,11 @@ const Inbox = ({ inboxFollows, getInboxFollows, inbox }) => {
               </View>
               <View style={styles.likeButton}>
                 <MaterialCommunityIcons.Button
+                  disabled={messagesLength}
                   style={styles.like}
                   name="email-mark-as-unread"
                   size={24}
-                  color="black"
+                  color={messagesLength ? "gray" : "black"}
                   onPress={handleSubmitInbox}
                 />
               </View>
@@ -260,6 +303,9 @@ const Inbox = ({ inboxFollows, getInboxFollows, inbox }) => {
 };
 
 const styles = StyleSheet.create({
+  aaa: {
+    color: 'yellow'
+  },
   formPosition: {
     position: 'absolute',
     bottom: 0,
@@ -401,11 +447,21 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 12,
     borderBottomRightRadius: 12,
   },
+  rowDisplay: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingRight: 10,
+    paddingLeft: 10
+  },
   dropdown2RowStyle: { backgroundColor: '#444', borderBottomColor: '#C5C5C5' },
-  dropdown2RowTxtStyle: {
+  dropdown2RowStyleNewMessage: { backgroundColor: 'green', borderBottomColor: '#C5C5C5', width: 10, height: 10, borderRadius: 50 },
+  nameRow: {
+    fontSize: 18,
     color: '#FFF',
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
 
   // dropdown3BtnStyle: {

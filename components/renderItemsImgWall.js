@@ -41,6 +41,7 @@ const RenderItem = ({
   const [likes, setLikes] = useState([]);
   const [comments, setComments] = useState([]);
   const [iLikeIt, setILikeIt] = useState('black');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     let imgId = item._id;
@@ -151,7 +152,7 @@ const RenderItem = ({
         />
       </View>
       <View style={styles.imageContent}>
-          <Image
+        <Image
           style={styles.imagina}
           resizeMode={'contain'} // height will be calculated automatically
           source={{ uri: `${baseUrl}${item.filename}` }}
@@ -159,43 +160,47 @@ const RenderItem = ({
       </View>
       <View style={styles.info}>
         {//likes
-            }
+        }
         <View>
-          {likes.length > 1 ? (
-            <TouchableOpacity
-              style={styles.user}
-              onPress={() =>
-                navigation.navigate('Likes', {
-                  localId: JSON.parse(idUser),
-                  likes: likes,
-                })
-              }>
-              <Text style={styles.padding}>
-                A {likes.length} personas le gusta.
-              </Text>
-            </TouchableOpacity>
-          ) : likes.length == 1 ? (
-            <TouchableOpacity
-              style={styles.user}
-              onPress={() =>
-                navigation.navigate('Likes', {
-                  localId: JSON.parse(idUser),
-                  likes: likes,
-                })
-              }>
-              <Text style={styles.padding}>
-                A {likes.length} persona le gusta.
-              </Text>
-            </TouchableOpacity>
-          ) : (
-            <Text style={styles.padding}>
-              Se el primero en marcar Me Gusta.
-            </Text>
-          )}
+          {
+            !likes.length ?
+              null
+              :
+              likes.length > 1 ? (
+                <TouchableOpacity
+                  style={styles.user}
+                  onPress={() =>
+                    navigation.navigate('Likes', {
+                      localId: JSON.parse(idUser),
+                      likes: likes,
+                    })
+                  }>
+                  <Text style={styles.padding}>
+                    A {likes.length} personas le gusta.
+                  </Text>
+                </TouchableOpacity>
+              ) : likes.length == 1 ? (
+                <TouchableOpacity
+                  style={styles.user}
+                  onPress={() =>
+                    navigation.navigate('Likes', {
+                      localId: JSON.parse(idUser),
+                      likes: likes,
+                    })
+                  }>
+                  <Text style={styles.padding}>
+                    A {likes.length} persona le gusta.
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <Text style={styles.padding}>
+                  Se el primero en marcar Me Gusta.
+                </Text>
+              )}
         </View>
         <View style={styles.form}>
           {//cantidad y comentarios
-            }
+          }
           <View>
             {//cantidad comentarios
             }
@@ -217,7 +222,7 @@ const RenderItem = ({
                 </Text>
               ) : null}
             </View>
-             {//mostrar comentarios
+            {//mostrar comentarios
             }
             <View>
               {comments[0] === undefined ? null : comments[0] !== undefined &&
@@ -284,7 +289,7 @@ const RenderItem = ({
             </View>
           </View>
           {//boton comentarios
-            }
+          }
           <View>
             <TouchableOpacity
               style={styles.user}
@@ -335,10 +340,10 @@ const styles = StyleSheet.create({
   },
   imagina: {
     flex: 1,
-        alignSelf: 'stretch',
-        width: Dimensions.get('window').width,
-        aspectRatio: 1
-},
+    alignSelf: 'stretch',
+    width: Dimensions.get('window').width,
+    aspectRatio: 1
+  },
   info: {
     display: 'flex',
     flexDirection: 'column',

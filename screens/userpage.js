@@ -21,7 +21,9 @@ import { connect } from 'react-redux';
 import {
   imagenWall,
   storiesCreator,
-  fetchUser
+  fetchUser,
+  removePhotograph,
+  removeVideo
 } from '../redux/ActionCreators';
 import { useFocusEffect } from '@react-navigation/native';
 import { baseUrl } from '../shared/baseurl';
@@ -37,7 +39,11 @@ const mapDispatchToProps = (dispatch) => ({
   storiesCreator: (mediaId, filedata) =>
     dispatch(storiesCreator(mediaId, filedata)),
   fetchUser: (username) =>
-    dispatch(fetchUser(username))
+    dispatch(fetchUser(username)),
+  removePhotograph: (username) =>
+    dispatch(removePhotograph(username)),
+  removeVideo: (username) =>
+    dispatch(removeVideo(username))
 });
 
 // const options = {
@@ -58,13 +64,20 @@ const Userpage = (props) => {
   const [duration, setDuration] = useState(0)
   const [loadWallType, setLoadWallType] = useState("")
   const [loadWall, setLoadWall] = useState(null)
-  const [messageModal, setMessageModal] = useState('')
-  const [isFormatModalOpen, setIsFormatModalOpen] = useState(false)
+  const [imgID, setImgID] = useState(null)
+  const [dataModal, setDataModal] = useState({
+    deleteModal: false,
+    isOpen: false,
+    messageModal: ''
+  })
   const [permission, setPermission] = useState(null)
   var myVideos = [];
   useEffect(() => {
-    setUserpage([props.user]);
-    setIsLoading(props.isLoading)
+    if (props.user) {
+      setUserpage([props.user]);
+      setIsLoading(props.isLoading)
+      setIsLoading(false)
+    }
   }, [props.user]);
 
   useFocusEffect(
@@ -99,8 +112,11 @@ const Userpage = (props) => {
   const handleWallimg = (img) => {
     let loadingType = img.type
     if (loadingType === "video") {
-      setIsFormatModalOpen(true)
-      setMessageModal('It is not a Image')
+      setDataModal({
+        deleteModal: false,
+        isOpen: true,
+        messageModal: 'It is not a Image'
+      })
     } else {
       setLoadWall(img)
       setDuration(10000)
@@ -122,8 +138,11 @@ const Userpage = (props) => {
       // }
       // video.src = URL.createObjectURL(files);
     } else {
-      setIsFormatModalOpen(true)
-      setMessageModal('It is not a Video')
+      setDataModal({
+        deleteModal: false,
+        isOpen: true,
+        messageModal: 'It is not a Video'
+      })
     }
   }
 
@@ -133,9 +152,11 @@ const Userpage = (props) => {
       setLoadWall(video)
       setDuration(testing)
     } else {
-
-      setIsFormatModalOpen(true)
-      setMessageModal('El video que intentaste publicar excede la duracion maxima de 1 minuto. Por favor, intente con otro video.')
+      setDataModal({
+        deleteModal: false,
+        isOpen: true,
+        messageModal: 'El video que intentaste publicar excede la duracion maxima de 1 minuto. Por favor, intente con otro video.'
+      })
     }
   }
 
@@ -178,6 +199,31 @@ const Userpage = (props) => {
         });
     }
   }
+  const deletePhotograph = async () => {
+    setIsLoading(true)
+    setUserpage(null);
+    var config = {
+      userid: userpage[0]._id,
+      imageid: imgID
+    }
+    const creds = await AsyncStorage.getItem('creds');
+    const username = JSON.parse(creds);
+    if (toogleTab === 'photo') {
+      props.removePhotograph(config)
+        .then((f) => {
+          props.fetchUser(username.username)
+        });
+      // props.history.push("/userpage");
+      // window.location.reload();
+    } else {
+      props.removeVideo(config)
+        .then((f) => {
+          props.fetchUser(username.username)
+        });
+      // props.history.push("/userpage");
+      // window.location.reload();
+    }
+  }
 
   const toogleMedia = (value) => {
     if (toogleTab !== value) seToogleTab(value);
@@ -187,47 +233,69 @@ const Userpage = (props) => {
     ? null
     : userpage.map((u) => {
       const photosWall = u.imagesWall.map((img) => {
-        return (
-          <View key={img._id} style={styles.imgWall}>
-            <TouchableHighlight
-              onPress={() =>
-                props.navigation.navigate('ImageWall', {
-                  itemId: img._id,
-                  info: u,
-                  mediaType: 'photo'
-                })
-              }>
-              <Image
-                style={styles.imgWall}
-                source={{ uri: `${baseUrl}${img.filename}` }}
-              />
-            </TouchableHighlight>
-          </View>
-        );
+        if (img._id) {
+          return (
+            <View key={img._id} style={styles.imgWall}>
+              <TouchableHighlight
+                onPress={() =>
+                  props.navigation.navigate('ImageWall', {
+                    itemId: img._id,
+                    info: u,
+                    mediaType: 'photo'
+                  })
+                }
+                onLongPress={() => {
+                  setImgID(img._id)
+                  setDataModal({
+                    deleteModal: true,
+                    messageModal: 'Do you want to delete this Image?',
+                    isOpen: true
+                  })
+                }}
+              >
+                <Image
+                  style={styles.imgWall}
+                  source={{ uri: `${baseUrl}${img.filename}` }}
+                />
+              </TouchableHighlight>
+            </View>
+          )
+        }
       });
       const videosWall = u.videosWall.map((img) => {
-        return (
-          <View key={img._id} style={styles.imgWall}>
-            <TouchableHighlight
-              onPress={() =>
-                props.navigation.navigate('ImageWall', {
-                  itemId: img._id,
-                  info: u,
-                  mediaType: 'video'
-                })
-              }>
-              <Video
-                source={{ uri: `${baseUrl}${img.filename}` }}
-                key={img._id}
-                resizeMode="cover"
-                style={{
-                  aspectRatio: 1,
-                  width: '100%',
+        if (img._id) {
+          return (
+            <View key={img._id} style={styles.imgWall}>
+              <TouchableHighlight
+                onPress={() =>
+                  props.navigation.navigate('ImageWall', {
+                    itemId: img._id,
+                    info: u,
+                    mediaType: 'video'
+                  })
+                }
+                onLongPress={() => {
+                  setImgID(img._id)
+                  setDataModal({
+                    deleteModal: true,
+                    messageModal: 'Do you want to delete this Video?',
+                    isOpen: true
+                  })
                 }}
-              />
-            </TouchableHighlight>
-          </View>
-        );
+              >
+                <Video
+                  source={{ uri: `${baseUrl}${img.filename}` }}
+                  key={img._id}
+                  resizeMode="cover"
+                  style={{
+                    aspectRatio: 1,
+                    width: '100%',
+                  }}
+                />
+              </TouchableHighlight>
+            </View>
+          )
+        }
       });
       return (
         <View key={u._id}>
@@ -236,23 +304,60 @@ const Userpage = (props) => {
             <Modal
               animationType="slide"
               transparent={true}
-              visible={isFormatModalOpen}
+              visible={dataModal.isOpen}
               onRequestClose={() => {
-                setIsFormatModalOpen(!isFormatModalOpen);
+                setDataModal((prevProps) => ({
+                  ...prevProps,
+                  isOpen: !dataModal.isOpen
+                }))
               }}
             >
               <View style={styles.centeredView}>
                 <View style={styles.modalView}>
-                  <Text style={styles.modalText}>{messageModal}</Text>
-                  <Pressable
-                    style={[styles.button, styles.buttonClose]}
-                    onPress={() => {
-                      setIsFormatModalOpen(!isFormatModalOpen)
-                      setMessageModal('')
-                    }}
-                  >
-                    <Text style={styles.textStyle}>Hide Modal</Text>
-                  </Pressable>
+                  <Text style={styles.modalText}>{dataModal.messageModal}</Text>
+                  {dataModal.deleteModal ?
+                    <View style={styles.pairOfButtons}>
+                      <Pressable
+                        style={[styles.button, styles.buttonClose]}
+                        onPress={() => {
+                          deletePhotograph()
+                          setDataModal((prevProps) => ({
+                            ...prevProps,
+                            messageModal: '',
+                            isOpen: !dataModal.isOpen
+                          }))
+                        }}
+                      >
+                        <Text style={styles.textStyle}>Delete</Text>
+                      </Pressable>
+                      <Pressable
+                        style={[styles.button, styles.buttonClose]}
+                        onPress={() => {
+                          setDataModal((prevProps) => ({
+                            ...prevProps,
+                            messageModal: '',
+                            isOpen: !dataModal.isOpen
+                          }))
+                        }}
+                      >
+                        <Text style={styles.textStyle}>Cancel</Text>
+                      </Pressable>
+                    </View>
+                    :
+                    <Pressable
+                      style={[styles.button, styles.buttonClose]}
+                      onPress={() => {
+                        setDataModal((prevProps) => ({
+                          ...prevProps,
+                          messageModal: '',
+                          isOpen: !dataModal.isOpen
+                        }))
+                      }}
+                    >
+                      <Text style={styles.textStyle}>Hide Modal</Text>
+                    </Pressable>
+                  }
+
                 </View>
               </View>
             </Modal>
@@ -342,7 +447,7 @@ const Userpage = (props) => {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                  
+
                     }}
                     name="video-vintage"
                     size={24}
@@ -570,6 +675,12 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: "center"
+  },
+  pairOfButtons: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center'
   }
 });
 

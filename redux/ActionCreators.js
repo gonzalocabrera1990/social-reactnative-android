@@ -514,47 +514,72 @@ export const followingError = (message) => {
   };
 };
 
-//DELETE IMAGE WALL
-export const removePhotograph = (imgId) => async (dispatch) => {
+//DELETE IMAGE AND VIDEO WALL
+export const removePhotograph = (imgId) => async dispatch => {
   dispatch(userLoading());
   const tok = await AsyncStorage.getItem('token');
   const token = JSON.parse(tok);
   const bearer = `Bearer ${token}`;
-  // var config = {
-  //   userid: JSON.parse(AsyncStorage.getItem("id")),
-  //     imageid: imgId
-  // }
   return fetch(baseUrl + `imagen/removeimage`, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify(imgId),
     headers: {
-      'Content-Type': 'application/json',
-      Authorization: bearer,
-    },
+      "Content-Type": "application/json",
+      'Authorization': bearer
+    }
   })
-    .then(
-      (response) => {
-        if (response.ok) {
-          return response;
-        } else {
-          var error = new Error(
-            'Setting Error ' + response.status + ': ' + response.statusText
-          );
-          error.response = response;
-          throw error;
-        }
-      },
-      (error) => {
-        var errmess = new Error(error.message);
-        throw errmess;
-      }
-    )
-    .then((data) => data.json())
-    .then((json) => {
+  .then(response => {
+    if (response.ok) {
+      return response;
+    } else {
+      var error = new Error("Setting Error " + response.status + ": " + response.statusText);
+      error.response = response;
+      throw error;
+    }
+  }, error => {
+    var errmess = new Error(error.message);
+    throw errmess;
+  }
+  )
+    .then(data => data.json())
+    .then(json => {
       dispatch(receiveUser(json));
     })
-    .catch((error) => dispatch(receiveUserError(error)));
-};
+    .catch(error => dispatch(receiveUserError(error)));
+}
+
+export const removeVideo = (imgId) => async dispatch => {
+  dispatch(userLoading());
+  const tok = await AsyncStorage.getItem('token');
+  const token = JSON.parse(tok);
+  const bearer = `Bearer ${token}`;
+  return fetch(baseUrl + `imagen/removevideo`, {
+    method: "POST",
+    body: JSON.stringify(imgId),
+    headers: {
+      "Content-Type": "application/json",
+      'Authorization': bearer
+    }
+  })
+  .then(response => {
+    if (response.ok) {
+      return response;
+    } else {
+      var error = new Error("Setting Error " + response.status + ": " + response.statusText);
+      error.response = response;
+      throw error;
+    }
+  }, error => {
+    var errmess = new Error(error.message);
+    throw errmess;
+  }
+  )
+    .then(data => data.json())
+    .then(json => {
+      dispatch(receiveUser(json));
+    })
+    .catch(error => dispatch(receiveUserError(error)));
+}
 
 //REGISTER POST DATA
 export const signupUser = (User) => (dispatch) => {
@@ -1147,7 +1172,7 @@ export const fetchUsersLikes = async (imgId) => {
   })
     .then((response) => response.json())
     .then((likes) => likes)
-    .catch((error) => setError(error.message));
+    .catch((error) => console.error(error.message));
 };
 
 export const fetchPhotoNativeLikes = (id) => async (dispatch) => {

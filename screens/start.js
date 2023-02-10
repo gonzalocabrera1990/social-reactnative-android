@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     
   },
   story: {
-    height: 130,
+    height: 115,
     paddingTop: Constants.statusBarHeight,
     backgroundColor: '#fff',
     width

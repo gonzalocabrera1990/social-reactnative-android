@@ -1,6 +1,5 @@
 import React, { useEffect, createContext } from 'react';
 import { Text, View } from "react-native";
-import { NavigationContainer } from '@react-navigation/native';
 import { connect } from "react-redux";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import io from "socket.io-client";
@@ -29,11 +28,9 @@ const Home = (props) => {
   }, []);
 
   return (
-    <NavigationContainer>
       <SocketContext.Provider value={{ socket }}>
         <MainStack />
       </SocketContext.Provider>
-    </NavigationContainer>
   )
   // }
 }

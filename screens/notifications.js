@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { FlatList, StyleSheet, ScrollView, Text } from 'react-native';
+import { FlatList, StyleSheet, View, Text } from 'react-native';
 
 import { useFocusEffect } from '@react-navigation/native';
 import { connect } from 'react-redux';
@@ -42,7 +42,7 @@ const Notifications = ({
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       {!index || index.length === 0 ? (
         <Text>No notifications yet</Text>
       ) : (
@@ -54,7 +54,7 @@ const Notifications = ({
           keyExtractor={(item) => item._id}
         />
       )}
-    </ScrollView>
+    </View>
   );
 };
 const styles = StyleSheet.create({

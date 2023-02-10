@@ -12,6 +12,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { baseUrl } from '../shared/baseurl';
 
+const { width, height } = Dimensions.get('window');
+
 export const Search = ({ navigation }) => {
   const [searchLoading, setSearchLoading] = useState(false);
   const [results, setResults] = useState(null);
@@ -50,9 +52,18 @@ export const Search = ({ navigation }) => {
   };
   let mapSearch = !results ? (
     <>
-      <Text style={styles.padding}> Resultados de busqueda.</Text>
+    <View style={styles.imaginaContent}>
+        <Image
+          source={require('../shared/assets/images/search.png')}
+       
+          style={styles.imagina}
+    resizeMode={'contain'} 
+        />
+        <Text style={styles.padding}> Search a user.</Text>
+      </View>
+      
     </>
-  ) : (
+  ) : results.length ? (
     results.map((user) => {
       return (
         <View style={styles.commentsContent} key={user._id} >
@@ -78,6 +89,21 @@ export const Search = ({ navigation }) => {
         </View>
       );
     })
+  )
+  :
+  (
+    <>
+    <View style={styles.imaginaContent}>
+        <Image
+          source={require('../shared/assets/images/noresults.png')}
+       
+          style={styles.imagina}
+    resizeMode={'contain'} 
+        />
+        <Text style={styles.padding}> No results.</Text>
+      </View>
+      
+    </>
   );
 
   return (
@@ -144,4 +170,17 @@ const styles = StyleSheet.create({
     marginRight: 10,
     color: 'black',
   },
+  imaginaContent: {
+    display: 'flex',
+    alignItems: 'center',
+    width, height: '100%',
+    marginTop: 100
+  },
+  imagina: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    width:180, height:180,
+    borderRadius: 50
+  }
 });

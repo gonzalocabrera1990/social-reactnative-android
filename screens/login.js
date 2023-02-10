@@ -92,7 +92,7 @@ class HomeScreen extends React.Component {
           <View style={styles.imgContent}>
             <Image
               style={styles.img}
-              source={{ uri: `${baseUrl}images/0.png` }}
+              source={require('../shared/assets/images/login.png')}
             />
           </View>
           <View>
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#b3ecb3',
   },
   contentContainer: {
-    paddingTop: 30,
+    paddingTop: 80,
     margin: 30,
   },
   imgContent: {

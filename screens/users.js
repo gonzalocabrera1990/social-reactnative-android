@@ -12,7 +12,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Video } from 'expo-av';
 import { useFocusEffect } from '@react-navigation/native';
-import Constants from 'expo-constants';
 
 import { baseUrl } from '../shared/baseurl';
 import { connect } from 'react-redux';
@@ -33,7 +32,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => ({
   fetchDataUser: (url) => dispatch(fetchDataUser(url)),
   followFetch: (followingId, followerId) => dispatch(followFetch(followingId, followerId)),
-  
+
 });
 
 const Users = (props) => {
@@ -67,7 +66,7 @@ const Users = (props) => {
     // }
   }, [props.route.params.localId, props.route.params.userId]);
   useEffect(() => {
-    if(info) props.fetchDataUser(info);
+    if (info) props.fetchDataUser(info);
   }, [info]);
   useEffect(() => {
     setUserpage(props.users.users);
@@ -83,19 +82,28 @@ const Users = (props) => {
     const followingId = props.route.params.localId;
     const userData = followerId;
     props.followFetch(followingId, userData).then((resp) => {
-      if(info) props.fetchDataUser(info);
+      if (info) props.fetchDataUser(info);
     });
   };
 
   const toogleMedia = (value) => {
     if (toogleTab !== value) seToogleTab(value);
   };
-  
+  const measure = (timestamp) => {
+    let inicio = new Date(timestamp).getTime();
+    let now = Date.now();
+    let res = now - inicio;
+    const hours = (Math.floor((res) / 1000)) / 3600;
+    return hours;
+  }
+  const storiesNoSeen = !props.users.users ? false : props.users.users.stories.some(h => measure(h.timestamp) <= 24000 && !h.views.some(v => v === props.user.user._id))
+  const storiesSeen = !props.users.users ? false : props.users.users.stories.some(h => measure(h.timestamp) <= 24000 && h.views.some(v => v === props.user.user._id))
+
   let userArray = [userpage];
   const UserS = !userpage
     ? null
     : !userArray[0].message
-    ? userArray.map((u) => {
+      ? userArray.map((u) => {
         const foll = u.followers.some((foll) =>
           foll.id._id === props.route.params.localId ? true : false
         );
@@ -133,15 +141,15 @@ const Users = (props) => {
                     mediaType: 'video'
                   })
                 }>
-                  <Video
-                source={{ uri: `${baseUrl}${img.filename}` }}
-                key={img._id}
-                resizeMode="cover"
-                style={{
-                  aspectRatio: 1,
-                  width: '100%',
-                }}
-              />
+                <Video
+                  source={{ uri: `${baseUrl}${img.filename}` }}
+                  key={img._id}
+                  resizeMode="cover"
+                  style={{
+                    aspectRatio: 1,
+                    width: '100%',
+                  }}
+                />
               </TouchableHighlight>
             </View>
           );
@@ -150,10 +158,47 @@ const Users = (props) => {
         return (
           <View key={u._id}>
             <View style={styles.user}>
-              <Image
-                style={styles.imgProfile}
-                source={{ uri: `${baseUrl}${u.image.filename}` }}
-              />
+
+              {storiesNoSeen ?
+                <TouchableHighlight onPress={() =>
+                  props.navigation.navigate('StoriesPlayUser', {
+                    userId: u._id,
+                    storyId: u.stories[0]._id,
+                    host: props.route.params.localId,
+                    user: props.route.params.userId
+                  })
+                } >
+                  <View style={styles.imgProfileNoSeen}>
+                    <Image
+                      style={styles.imgProfile}
+                      source={{ uri: `${baseUrl}${u.image.filename}` }}
+                    />
+                  </View>
+                </TouchableHighlight>
+                : storiesSeen ?
+                  <TouchableHighlight onPress={() =>
+                    props.navigation.navigate('StoriesPlayUser', {
+                      userId: u._id,
+                      storyId: u.stories[0]._id,
+                      host: props.route.params.localId,
+                      user: props.route.params.userId
+                    })
+                  }>
+                    <View style={styles.imgProfileSeen}>
+                      <Image
+                        style={styles.imgProfile}
+                        source={{ uri: `${baseUrl}${u.image.filename}` }}
+                      />
+                    </View>
+                  </TouchableHighlight>
+                  :
+                  <View style={styles.imgProfile}>
+                    <Image
+                      style={styles.imgProfile}
+                      source={{ uri: `${baseUrl}${u.image.filename}` }}
+                    />
+                  </View>
+              }
               <View style={styles.userInfo}>
                 <Text>
                   {u.firstname} {u.lastname}
@@ -161,30 +206,37 @@ const Users = (props) => {
                 <Text>{u.phrase}</Text>
                 <View style={styles.follows}>
                   <TouchableHighlight
-                    onPress={() => props.navigation.navigate('Follows',{
+                    onPress={() => props.navigation.navigate('Follows', {
                       type: 'followers',
-                      userId: u._id 
+                      userId: u._id
                     })}>
                     <Text>Followers {u.followers.length}</Text>
                   </TouchableHighlight>
                   <TouchableHighlight
-                    onPress={() => props.navigation.navigate('Follows',{
+                    onPress={() => props.navigation.navigate('Follows', {
                       type: 'following',
-                      userId: u._id 
+                      userId: u._id
                     })}>
                     <Text>Following {u.following.length}</Text>
                   </TouchableHighlight>
                 </View>
                 <View style={styles.buttonItems}>
                   {noti === true ? (
-                    <MaterialCommunityIcons
-                      style={styles.follow}
-                      name="timer-sand"
-                      size={24}
-                      color="black"
-                    />
+                    <View
+                      style={styles.followContainer}
+                    >
+                      <MaterialCommunityIcons
+                        style={styles.follow}
+                        name="timer-sand"
+                        size={24}
+                        color="black"
+                      />
+                    </View>
                   ) : foll === false ? (
-                    <TouchableHighlight onPress={() => handleFollow(u._id)}>
+                    <TouchableHighlight
+                      onPress={() => handleFollow(u._id)}
+                      style={styles.followContainer}
+                    >
                       <MaterialIcons
                         style={styles.follow}
                         name="person-add-alt-1"
@@ -193,12 +245,15 @@ const Users = (props) => {
                       />
                     </TouchableHighlight>
                   ) : (
-                    <MaterialIcons
-                      style={styles.follow}
-                      name="check"
-                      size={24}
-                      color="black"
-                    />
+                    <View
+                      style={styles.followContainer}>
+                      <MaterialIcons
+                        style={styles.follow}
+                        name="check"
+                        size={24}
+                        color="black"
+                      />
+                    </View>
                   )}
                 </View>
               </View>
@@ -231,7 +286,7 @@ const Users = (props) => {
           </View>
         );
       })
-    : userArray.map((u) => {
+      : userArray.map((u) => {
         const foll = u.followers.some((foll) =>
           foll.id._id === props.route.params.localId ? true : false
         );
@@ -305,7 +360,7 @@ const Users = (props) => {
           </View>
         );
       });
-  return <ScrollView style={styles.container}>{UserS}</ScrollView>;
+  return <ScrollView style={styles.container}>{UserS}</ScrollView>
 };
 
 const styles = StyleSheet.create({
@@ -317,14 +372,29 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
     margin: 10,
   },
   imgProfile: {
+    height: '100%',
+    width: '100%',
+    borderRadius: 50,
+  },
+  imgProfileNoSeen: {
     height: 100,
     width: 100,
     borderRadius: 50,
-    marginRight: 15,
+    borderColor: '#4CAF50',
+    borderStyle: 'solid',
+    borderWidth: 5
+  },
+  imgProfileSeen: {
+    height: 100,
+    width: 100,
+    borderRadius: 50,
+    borderColor: '#cbc9df',
+    borderStyle: 'solid',
+    borderWidth: 5
   },
   userInfo: {
     paddingTop: 30,
@@ -334,9 +404,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  follow: {
-    width: 155,
+  followContainer: {
+    width: 100,
     height: 35,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#288818',
+  },
+
+  follow: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -392,3 +469,101 @@ const styles = StyleSheet.create({
   },
 });
 export default connect(mapStateToProps, mapDispatchToProps)(Users);
+// const enteringAnimation = new Keyframe({
+  //   0: {
+  //     borderRightColor: '#4CAF50',
+  //     borderRightColor: 5,
+  //     borderStyle: 'dotted',
+  //     borderBottomColor: '#4CAF50',
+  //     borderBottomColor: 5,
+  //     borderStyle: 'dotted',
+  //     borderLeftColor: '#4CAF50',
+  //     borderLeftColor: 5,
+  //     borderStyle: 'dotted',
+  //     borderTopColor: '#4CAF50',
+  //     borderTopColor: 5,
+  //     borderStyle: 'dotted',
+  //       transform: [{rotate: '0deg'}],
+  //   },
+  //   15:{
+  //       borderRightColor: '#4CAF50',
+  //       borderRightColor: 5,
+  //       borderStyle: 'dotted'
+  //   },
+  //   30:{
+  //     borderRightColor: '#4CAF50',
+  //     borderRightColor: 5,
+  //     borderStyle: 'dotted',
+  //     borderBottomColor: '#4CAF50',
+  //     borderBottomColor: 5,
+  //     borderStyle: 'dotted'
+  //   },
+  //   45:{
+  //     borderRightColor: '#4CAF50',
+  //     borderRightColor: 5,
+  //     borderStyle: 'dashed',
+  //     borderBottomColor: '#4CAF50',
+  //     borderBottomColor: 5,
+  //     borderStyle: 'dotted',
+  //     borderLeftColor: '#4CAF50',
+  //     borderLeftColor: 5,
+  //     borderStyle: 'dotted'
+  //   },
+  //   60:{
+  //     borderRightColor: '#4CAF50',
+  //     borderRightColor: 5,
+  //     borderStyle: 'dashed',
+  //     borderBottomColor: '#4CAF50',
+  //     borderBottomColor: 5,
+  //     borderStyle: 'dashed',
+  //     borderLeftColor: '#4CAF50',
+  //     borderLeftColor: 5,
+  //     borderStyle: 'dotted',
+  //     borderTopColor: '#4CAF50',
+  //     borderTopColor: 5,
+  //     borderStyle: 'dotted'
+  //   },
+  //   75:{
+  //     borderRightColor: '#4CAF50',
+  //     borderRightColor: 5,
+  //     borderStyle: 'solid',
+  //     borderBottomColor: '#4CAF50',
+  //     borderBottomColor: 5,
+  //     borderStyle: 'dashed',
+  //     borderLeftColor: '#4CAF50',
+  //     borderLeftColor: 5,
+  //     borderStyle: 'dashed',
+  //     borderTopColor: '#4CAF50',
+  //     borderTopColor: 5,
+  //     borderStyle: 'dotted'
+  //   },
+  //   85:{
+  //     borderRightColor: '#4CAF50',
+  //     borderRightColor: 5,
+  //     borderStyle: 'solid',
+  //     borderBottomColor: '#4CAF50',
+  //     borderBottomColor: 5,
+  //     borderStyle: 'solid',
+  //     borderLeftColor: '#4CAF50',
+  //     borderLeftColor: 5,
+  //     borderStyle: 'dashed',
+  //     borderTopColor: '#4CAF50',
+  //     borderTopColor: 5,
+  //     borderStyle: 'dashed'
+  //   },
+  //   100:{
+  //     borderRightColor: '#4CAF50',
+  //     borderRightColor: 5,
+  //     borderStyle: 'solid',
+  //     borderBottomColor: '#4CAF50',
+  //     borderBottomColor: 5,
+  //     borderStyle: 'solid',
+  //     borderLeftColor: '#4CAF50',
+  //     borderLeftColor: 5,
+  //     borderStyle: 'solid',
+  //     borderTopColor: '#4CAF50',
+  //     borderTopColor: 5,
+  //     borderStyle: 'solid',
+  //     transform: [{rotate: '180deg'}]
+  //   }
+  // }).duration(1500);

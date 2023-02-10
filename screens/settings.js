@@ -131,7 +131,7 @@ const Settings = (props) => {
             }
           />
 
-          <View>
+          <View style={styles.switchContent}>
             <Switch
               trackColor={{ false: '#767577', true: '#81b0ff' }}
               thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
@@ -205,9 +205,16 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 30,
   },
+  switchContent: {
+    display:'flex',
+    flexDirection: 'row',
+    alignItems:'center',
+    justifyContent:'flex-start'
+  },
   allinputs: {
     marginTop: 10,
     marginBottom: 10,
+    paddingLeft: 8,
     height: 30,
     color: '#444',
     textAlign: 'left',

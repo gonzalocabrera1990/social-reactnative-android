@@ -86,8 +86,11 @@ export const StartImage = ({
           style={styles.user}
           onPress={() =>
             navigation.navigate('Users', {
-              localId: JSON.parse(ID),
-              userId: image.userId._id,
+              screen: 'Usuario',
+              params: {
+                localId: JSON.parse(ID),
+                userId: image.userId._id,
+              } 
             })
           }>
           <Image
@@ -177,12 +180,16 @@ export const StartImage = ({
                       <TouchableOpacity
                         style={styles.user}
                         onPress={() =>
-                          navigation.navigate('Users', {
+                        navigation.navigate('Users', {
+                          screen: 'Usuario',
+                          params: {
                             localId: JSON.parse(ID),
                             userId:
                               comments[0][comments[0].length - 2].author._id,
-                          })
-                        }>
+                          } 
+                        })
+                      }
+                        >
                         <Text style={styles.author}>
                           {comments[0][comments[0].length - 2].author.usuario}
                         </Text>
@@ -197,12 +204,16 @@ export const StartImage = ({
                       <TouchableOpacity
                         style={styles.user}
                         onPress={() =>
-                          navigation.navigate('Users', {
+                        navigation.navigate('Users', {
+                          screen: 'Usuario',
+                          params: {
                             localId: JSON.parse(ID),
                             userId:
                               comments[0][comments[0].length - 1].author._id,
-                          })
-                        }>
+                          } 
+                        })
+                      }
+                        >
                         <Text style={styles.author}>
                           {comments[0][comments[0].length - 1].author.usuario}
                         </Text>
@@ -219,11 +230,15 @@ export const StartImage = ({
                     <TouchableOpacity
                       style={styles.user}
                       onPress={() =>
-                        navigation.navigate('Users', {
+                      navigation.navigate('Users', {
+                        screen: 'Usuario',
+                        params: {
                           localId: JSON.parse(ID),
                           userId: comments[0].author._id,
-                        })
-                      }>
+                        } 
+                      })
+                    }
+                      >
                       <Text style={styles.author}>
                         {comments[0].author.usuario}
                       </Text>

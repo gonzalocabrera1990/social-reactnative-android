@@ -50,7 +50,6 @@ const Tab = createBottomTabNavigator();
 // console.log("navbar", auth);
 
 const ProfileStack = createNativeStackNavigator();
-
 function ProfileStackScreen({ navigation, route }) {
 
   // useEffect(() => {
@@ -69,10 +68,10 @@ function ProfileStackScreen({ navigation, route }) {
         gestureDirection: "horizontal",
         headerShown: false
       }}
-      initialRouteName="Profile"
+      initialRouteName="Userpage"
     >
       <ProfileStack.Screen
-        name="Profile"
+        name="Userpage"
         component={Userpage} />
       <ProfileStack.Screen
         name="Settings"
@@ -104,6 +103,60 @@ function ProfileStackScreen({ navigation, route }) {
         component={ImageProfile}
       />
     </ProfileStack.Navigator>
+  );
+}
+
+const UsersStack = createNativeStackNavigator();
+function UsersStackScreen({ navigation, route }) {
+
+  // useEffect(() => {
+  //   if (tabHiddenRoutes.includes(getFocusedRouteNameFromRoute(route))) {
+  //     navigation.setOptions({ tabBarVisible: false });
+  //   } else {
+  //     navigation.setOptions({ tabBarVisible: true });
+  //   }
+  // }, [navigation, route]);
+
+  return (
+    <UsersStack.Navigator
+      headerMode="none"
+      screenOptions={{
+        gestureEnabled: true,
+        gestureDirection: "horizontal",
+        headerShown: false
+      }}
+      initialRouteName="Usuario"
+    >
+      <UsersStack.Screen
+       name="Usuario"
+       component={Users}
+       />
+      <UsersStack.Screen
+        name="RenderItem"
+        component={RenderItem}
+      />
+      <UsersStack.Screen
+        name="RenderItemVid"
+        component={RenderItemVid}
+
+      />
+      <UsersStack.Screen
+        name="MsProfile"
+        component={MProfile}
+      />
+      <UsersStack.Screen
+        name="Follows"
+        component={Follows}
+      />
+      <UsersStack.Screen
+        name="Likes"
+        component={Likes}
+      />
+      <UsersStack.Screen
+        name="StoriesPlayUser"
+        component={StoriesPlayUser}
+      />
+    </UsersStack.Navigator>
   );
 }
 
@@ -280,7 +333,7 @@ const MainTab = (props) => {
                   <>
                     <Tab.Screen name="Home" component={Start} />
                     {/* <Tab.Screen name="Profile" component={Userpage} /> */}
-                    <Tab.Screen name="Profile" component={Userpage} />
+                    <Tab.Screen name="Profile" component={ProfileStackScreen} />
 
                     <Tab.Screen
                       options={inboxBadge ? { tabBarBadge: inboxBadge } : null}
@@ -296,7 +349,7 @@ const MainTab = (props) => {
                       name="Notifications"
                       component={Notifications} />
                     <Tab.Screen name="Search" component={Search} />
-                    <Tab.Screen
+                   {/* <Tab.Screen
                       name="ImageWall"
                       component={ImageWall}
                       options={{
@@ -310,7 +363,7 @@ const MainTab = (props) => {
                       tabBarButton: () => null,
                     }}
                   />
-                    <Tab.Screen
+                     <Tab.Screen
                     name="RenderItem"
                     component={RenderItem}
                     options={{
@@ -325,15 +378,15 @@ const MainTab = (props) => {
                       tabBarButton: () => null,
                       tabBarStyle: { display: 'none' },
                     }}
-                  />
-                  <Tab.Screen
+                  /> */}
+                  {/* <Tab.Screen
                     name="MsProfile"
                     component={MProfile}
                     options={{
                       tabBarButton: () => null,
                       tabBarStyle: { display: 'none' },
                     }}
-                  />
+                  /> */}
                     <Tab.Screen
                       name="Messages"
                       component={Messages}
@@ -342,14 +395,14 @@ const MainTab = (props) => {
                         tabBarStyle: { display: 'none' },
                       }}
                     />
-                    <Tab.Screen
+                    {/* <Tab.Screen
                     name="Follows"
                     component={Follows}
                     options={{
                       tabBarButton: () => null,
                       tabBarStyle: { display: 'none' },
                     }}
-                  />
+                  /> */}
                   <Tab.Screen
                     name="Likes"
                     component={Likes}
@@ -358,17 +411,17 @@ const MainTab = (props) => {
                       tabBarStyle: { display: 'none' },
                     }}
                   />
-                  <Tab.Screen
+                  {/* <Tab.Screen
                     name="ImageProfile"
                     component={ImageProfile}
                     options={{
                       tabBarButton: () => null,
                       tabBarStyle: { display: 'none' },
                     }}
-                  />
+                  /> */}
                     <Tab.Screen
                       name="Users"
-                      component={Users}
+                      component={UsersStackScreen}
                       options={{
                         tabBarButton: () => null,
                       }}
@@ -381,14 +434,14 @@ const MainTab = (props) => {
                         tabBarStyle: { display: 'none' },
                       }}
                     />
-                    <Tab.Screen
+                    {/* <Tab.Screen
                       name="StoriesPlayUser"
                       component={StoriesPlayUser}
                       options={{
                         tabBarButton: () => null,
                         tabBarStyle: { display: 'none' },
                       }}
-                    />
+                    /> */}
                   </>
                 )
                 : null
@@ -400,52 +453,33 @@ const MainTab = (props) => {
 export default connect(mapStateToProps, mapDispatchToProps)(MainTab);
 
 
-//const UsersStack = createNativeStackNavigator();
-// function UsersStack({ navigation, route }) {
-
-//   // useEffect(() => {
-//   //   if (tabHiddenRoutes.includes(getFocusedRouteNameFromRoute(route))) {
-//   //     navigation.setOptions({ tabBarVisible: false });
-//   //   } else {
-//   //     navigation.setOptions({ tabBarVisible: true });
-//   //   }
-//   // }, [navigation, route]);
-
+// const StartStack = createNativeStackNavigator();
+// function StartStackScreen({ navigation, route }) {
 //   return (
-//     <UsersStack.Navigator
+//     <StartStack.Navigator
 //       headerMode="none"
 //       screenOptions={{
 //         gestureEnabled: true,
 //         gestureDirection: "horizontal",
 //         headerShown: false
 //       }}
-//       initialRouteName="Profile"
+//       initialRouteName="Start"
 //     >
-//       <UsersStack.Screen
-//        name="User"
-//        component={Users}
-//        />
-//       <UsersStack.Screen
-//         name="RenderItem"
-//         component={RenderItem}
+//       <StartStack.Screen
+//         name="Start" component={Start}
 //       />
-//       <UsersStack.Screen
-//         name="RenderItemVid"
-//         component={RenderItemVid}
-
+//       <StartStack.Screen
+//         name="Messages"
+//         component={Messages}
 //       />
-//       <UsersStack.Screen
-//         name="MsProfile"
-//         component={MProfile}
-//       />
-//       <UsersStack.Screen
-//         name="Follows"
-//         component={Follows}
-//       />
-//       <UsersStack.Screen
+//       <StartStack.Screen
 //         name="Likes"
 //         component={Likes}
 //       />
-//     </UsersStack.Navigator>
+//       <StartStack.Screen
+//         name="StoriesPlay"
+//         component={StoriesPlay}
+//       />
+//     </StartStack.Navigator>
 //   );
 // }

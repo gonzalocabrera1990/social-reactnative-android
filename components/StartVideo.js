@@ -89,8 +89,11 @@ export const StartVideo = ({
           style={styles.user}
           onPress={() =>
             navigation.navigate('Users', {
-              localId: JSON.parse(ID),
-              userId: image.userId._id,
+              screen: 'Usuario',
+              params: {
+                localId: JSON.parse(ID),
+                userId: image.userId._id,
+              } 
             })
           }>
           <Image
@@ -199,12 +202,15 @@ export const StartVideo = ({
                       <TouchableOpacity
                         style={styles.user}
                         onPress={() =>
-                          navigation.navigate('Users', {
+                        navigation.navigate('Users', {
+                          screen: 'Usuario',
+                          params: {
                             localId: JSON.parse(ID),
                             userId:
-                              comments[0][comments[0].length - 2].author._id,
-                          })
-                        }>
+                              comments[0][comments[0].length - 2].author._id
+                          } 
+                        })
+                      }>
                         <Text style={styles.author}>
                           {comments[0][comments[0].length - 2].author.usuario}
                         </Text>
@@ -220,9 +226,12 @@ export const StartVideo = ({
                         style={styles.commentsContent}
                         onPress={() =>
                           navigation.navigate('Users', {
-                            localId: JSON.parse(ID),
+                            screen: 'Usuario',
+                            params: {
+                              localId: JSON.parse(ID),
                             userId:
                               comments[0][comments[0].length - 1].author._id,
+                            } 
                           })
                         }>
                         <Text style={styles.author}>
@@ -242,8 +251,11 @@ export const StartVideo = ({
                       style={styles.commentsContent}
                       onPress={() =>
                         navigation.navigate('Users', {
-                          localId: JSON.parse(ID),
-                          userId: comments[0].author._id,
+                          screen: 'Usuario',
+                          params: {
+                            localId: JSON.parse(ID),
+                            userId: comments[0].author._id,
+                          } 
                         })
                       }>
                       <Text style={styles.author}>

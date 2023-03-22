@@ -54,7 +54,6 @@ export const loginUser = (creds) => (dispatch) => {
   // We dispatch requestLogin to kickoff the call to the API
   dispatch(userLoading());
   dispatch(requestLogin(creds));
-  console.log("aaa");
   AsyncStorage.clear();
   return fetch(baseUrl + 'users/login', {
     method: 'POST',

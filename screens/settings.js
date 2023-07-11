@@ -86,7 +86,15 @@ const Settings = (props) => {
   const handleSubmit = () => {
     const userid = props.user.user._id;
     props.settingsUser(userid, dataForm).then(() => {
-      props.navigation.navigate('Profile');
+      setDataForm({
+        firstname: '',
+        lastname: '',
+        phrase: '',
+        status: dataForm.status
+      })
+      props.navigation.navigate('Profile', {
+        screen: 'Userpage'
+      });
     });
   };
 
@@ -107,6 +115,8 @@ const Settings = (props) => {
                 firstname: text,
               }))
             }
+            value={dataForm.firstname}
+
           />
 
           <TextInput
@@ -118,6 +128,7 @@ const Settings = (props) => {
                 lastname: text,
               }))
             }
+            value={dataForm.lastname}
           />
 
           <TextInput
@@ -129,6 +140,7 @@ const Settings = (props) => {
                 phrase: text,
               }))
             }
+            value={dataForm.phrase}
           />
 
           <View style={styles.switchContent}>
@@ -143,7 +155,7 @@ const Settings = (props) => {
             </Text>
           </View>
         </View>
-        <View>
+        <View style={styles.logoutContent} >
           <Button color="green" title="Send" onPress={handleSubmit} />
         </View>
       </View>

@@ -42,13 +42,13 @@ export const StartImage = ({
     })();
 
     setComments(image.commento);
-  }, []);
+  }, [image.commento]);
 
 
   useEffect(() => {
     let imgId = image.imageId ? image.imageId._id : image.videoId._id;
     fetchLikes(imgId);
-  }, []);
+  }, [image]);
 
   async function fetchLikes(id) {
     const bearer = 'Bearer ' + (await AsyncStorage.getItem('token'));
@@ -275,9 +275,9 @@ const styles = StyleSheet.create({
   },
   imagina: {
     flex: 1,
-        alignSelf: 'stretch',
-        width: width,
-        aspectRatio: 1
+    alignSelf: 'stretch',
+    width: width,
+    aspectRatio: 1
 },
   container: {
     display: 'flex',
@@ -285,6 +285,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     marginBottom: 30,
+    elevation: 10,
+    shadowColor: '#52006A',
   },
   containerHead: {
     display: 'flex',

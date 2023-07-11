@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { FlatList, StyleSheet, View, Text } from 'react-native';
+import { FlatList, StyleSheet, View, Text, Image, Dimensions } from 'react-native';
 
 import { useFocusEffect } from '@react-navigation/native';
 import { connect } from 'react-redux';
@@ -8,6 +8,8 @@ import { fetchNotifications } from '../redux/ActionCreators';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import ItemNotifications from '../components/renderItemsNotifications';
 import { baseUrl } from '../shared/baseurl';
+const { width, height } = Dimensions.get('window');
+
 
 const mapStateToProps = (state) => {
   return {
@@ -21,7 +23,7 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 const Notifications = ({
-  route,
+  route, 
   navigation,
   user,
   notifications,
@@ -44,7 +46,16 @@ const Notifications = ({
   return (
     <View style={styles.container}>
       {!index || index.length === 0 ? (
-        <Text>No notifications yet</Text>
+         <>
+         <View style={styles.imaginaContent}>
+            <Image
+              source={require('../shared/assets/images/noNotifications.png')}
+              style={styles.imagina}
+              resizeMode={'contain'} 
+            />
+             <Text style={styles.padding}> No notifications yet.</Text>
+           </View>
+         </>
       ) : (
         <FlatList
           data={index}
@@ -100,5 +111,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  imaginaContent: {
+    display: 'flex',
+    alignItems: 'center',
+    width, height: '100%',
+    marginTop: 100
+  },
+  imagina: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    width:180, height:180,
+    borderRadius: 50
+  }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(Notifications);

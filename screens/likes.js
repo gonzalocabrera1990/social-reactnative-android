@@ -29,8 +29,11 @@ export const Likes = ({ navigation, route }) => {
             style={styles.commentsContent}
             onPress={() =>
               navigation.navigate('Users', {
-                localId: route.params.localId,
-                userId: user._id,
+                screen: 'Usuario',
+                params: {
+                  localId: route.params.localId,
+                  userId: user._id,
+                }
               })
             }>
             <Image

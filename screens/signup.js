@@ -68,6 +68,14 @@ export const Signup = ({ navigation, signup, signupUser }) => {
     useCallback(() => {
       return () => {
         setMessageResponse(null);
+        setDataForm((prevProps) => ({
+          username: '',
+          password: '',
+          repeatpassword: '',
+          gender: '',
+          country: '',
+          date: ''
+        }));
       };
     }, [])
   );
@@ -244,6 +252,7 @@ export const Signup = ({ navigation, signup, signupUser }) => {
                     }))
                   }
                   onBlur={handleBlur('username')}
+                  value={dataForm.username}
                 />
                 <Text style={styles.errorForm}>{error.username.err}</Text>
               </View>
@@ -258,6 +267,7 @@ export const Signup = ({ navigation, signup, signupUser }) => {
                   style={styles.allinputs}
                   placeholder="Password"
                   onBlur={handleBlur('password')}
+                  value={dataForm.password}
                 />
                 <Text style={styles.errorForm}>{error.password.err}</Text>
               </View>
@@ -272,6 +282,7 @@ export const Signup = ({ navigation, signup, signupUser }) => {
                   style={styles.allinputs}
                   placeholder="Repeat password"
                   onBlur={handleBlur('repeatpassword')}
+                  value={dataForm.repeatpassword}
                 />
                 <Text style={styles.errorForm}>{error.repeatpassword.err}</Text>
               </View>

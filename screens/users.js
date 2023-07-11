@@ -116,10 +116,13 @@ const Users = (props) => {
             <View key={img._id} style={styles.imgWall}>
               <TouchableHighlight
                 onPress={() =>
-                  props.navigation.navigate('ImageWall', {
-                    itemId: img._id,
-                    info: u,
-                    mediaType: 'photo'
+                  props.navigation.navigate('Users', {
+                    screen: "ImageWall",
+                    params: {
+                      itemId: img._id,
+                      info: u,
+                      mediaType: 'photo'
+                    }
                   })
                 }>
                 <Image
@@ -135,10 +138,13 @@ const Users = (props) => {
             <View key={img._id} style={styles.imgWall}>
               <TouchableHighlight
                 onPress={() =>
-                  props.navigation.navigate('ImageWall', {
-                    itemId: img._id,
-                    info: u,
-                    mediaType: 'video'
+                  props.navigation.navigate('Users', {
+                    screen: "ImageWall",
+                    params: {
+                      itemId: img._id,
+                      info: u,
+                      mediaType: 'video'
+                    }
                   })
                 }>
                 <Video
@@ -192,7 +198,7 @@ const Users = (props) => {
                     </View>
                   </TouchableHighlight>
                   :
-                  <View style={styles.imgProfile}>
+                  <View style={styles.imgProfileStandar}>
                     <Image
                       style={styles.imgProfile}
                       source={{ uri: `${baseUrl}${u.image.filename}` }}
@@ -296,10 +302,12 @@ const Users = (props) => {
         return (
           <View key={u._id}>
             <View style={styles.user}>
-              <Image
-                style={styles.imgProfile}
-                source={{ uri: `${baseUrl}${u.image.filename}` }}
-              />
+              <View style={styles.imgProfileStandar}>
+                <Image
+                  style={styles.imgProfile}
+                  source={{ uri: `${baseUrl}${u.image.filename}` }}
+                />
+              </View>
               <View style={styles.userInfo}>
                 <Text>
                   {u.firstname} {u.lastname}
@@ -395,6 +403,10 @@ const styles = StyleSheet.create({
     borderColor: '#cbc9df',
     borderStyle: 'solid',
     borderWidth: 5
+  },
+  imgProfileStandar: {
+    height: 100,
+    width: 100
   },
   userInfo: {
     paddingTop: 30,

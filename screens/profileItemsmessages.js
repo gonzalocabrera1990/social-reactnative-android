@@ -131,8 +131,11 @@ const MProfile = ({ navigation, route, messageUpdate, commentsPost, fetchComment
                   style={styles.commentsItems}
                   onPress={() =>
                     navigation.navigate('Users', {
-                      localId: route.params.myUserId,
-                      userId: message.author._id,
+                      screen: 'Usuario',
+                      params: {
+                        localId: route.params.myUserId,
+                        userId: message.author._id,
+                      }
                     })
                   }>
                   <Image
@@ -313,7 +316,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     zIndex: 1,
     position: 'absolute',
-    bottom: 25,
+    bottom: 73,
     zIndex:10,
     width
   },

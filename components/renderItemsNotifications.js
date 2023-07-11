@@ -57,8 +57,11 @@ const ItemNotifications = ({
             style={styles.user}
             onPress={() =>
               navigation.navigate('Users', {
-                localId: localHost,
-                userId: item.followingId._id,
+                screen: 'Usuario',
+                params: {
+                  localId: localHost,
+                  userId: item.followingId._id,
+                }
               })
             }>
             <Image
@@ -94,8 +97,8 @@ const ItemNotifications = ({
               </TouchableOpacity>
             </>
           ) : (
-            <Text style={{ color: requestColor }}>{requestResponse}</Text>
-          )}
+            // <Text style={{ color: requestColor }}>{requestResponse}</Text>
+            <MaterialIcons name="done-outline" size={24} color={requestColor} />          )}
         </View>
       </View>
     </View>

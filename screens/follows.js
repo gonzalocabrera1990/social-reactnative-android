@@ -47,8 +47,14 @@ const Follows = ({ navigation, route, getFollows }) => {
   const getResultsFollow = () => {
     getFollows(route.params.type, route.params.userId)
       .then((json) => {
-        setResults(json);
-        setSearchLoading(false);
+        if(!json) {
+          setTimeout(() => {
+            navigation.goBack()
+          }, 3000);
+        }
+          setResults(json);
+          setSearchLoading(false);
+       
       })
       .catch((err) => {
         setError(err);
@@ -67,8 +73,11 @@ const Follows = ({ navigation, route, getFollows }) => {
             style={styles.followsContent}
             onPress={() =>
               navigation.navigate('Users', {
-                localId: JSON.parse(ID),
-                userId: user.id._id,
+                screen: 'Usuario',
+                params: {
+                  localId: JSON.parse(ID),
+                  userId: user.id._id
+                } 
               })
             }>
             <Image

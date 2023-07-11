@@ -101,8 +101,11 @@ const RenderItemVid = ({
           style={styles.user}
           onPress={() =>
             navigation.navigate('Users', {
-              localId: JSON.parse(idUser),
-              userId: userpage._id,
+              screen: 'Usuario',
+              params: {
+                localId: JSON.parse(idUser),
+                userId: userpage._id,
+              }
             })
           }>
           <Image
@@ -206,8 +209,11 @@ const RenderItemVid = ({
                         style={styles.user}
                         onPress={() =>
                           navigation.navigate('Users', {
-                            localId: JSON.parse(idUser),
-                            userId: comments[comments.length - 2].author._id,
+                            screen: 'Usuario',
+                            params: {
+                              localId: JSON.parse(idUser),
+                              userId: comments[comments.length - 2].author._id,
+                            }
                           })
                         }>
                         <Text style={styles.author}>
@@ -225,8 +231,11 @@ const RenderItemVid = ({
                         style={styles.user}
                         onPress={() =>
                           navigation.navigate('Users', {
-                            localId: JSON.parse(idUser),
-                            userId: comments[comments.length - 1].author._id,
+                            screen: 'Usuario',
+                            params: {
+                              localId: JSON.parse(idUser),
+                              userId: comments[comments.length - 1].author._id,
+                            }
                           })
                         }>
                         <Text style={styles.author}>
@@ -246,8 +255,11 @@ const RenderItemVid = ({
                       style={styles.user}
                       onPress={() =>
                         navigation.navigate('Users', {
-                          localId: JSON.parse(idUser),
-                          userId: comments[0].author._id,
+                          screen: 'Usuario',
+                          params: {
+                            localId: JSON.parse(idUser),
+                            userId: comments[0].author._id,
+                          }
                         })
                       }>
                       <Text style={styles.author}>

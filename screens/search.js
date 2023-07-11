@@ -70,9 +70,16 @@ export const Search = ({ navigation }) => {
           <TouchableOpacity
             style={styles.commentsContent}
             onPress={() =>
+              // navigation.navigate('Users', {
+              //   localId: JSON.parse(ID),
+              //   userId: user._id,
+              // })
               navigation.navigate('Users', {
-                localId: JSON.parse(ID),
-                userId: user._id,
+                screen: 'Usuario',
+                params: {
+                  localId: JSON.parse(ID),
+                  userId: user._id,
+                } 
               })
             }>
             <Image

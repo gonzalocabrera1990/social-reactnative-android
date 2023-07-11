@@ -66,7 +66,14 @@ export const ImageProfile = ({ route, imagenUser, fetchUser, navigation }) => {
             (async () => {
                 const tok = await AsyncStorage.getItem('creds');
                 const id = JSON.parse(tok);
-                if(id.username) fetchUser(id.username).then(navigation.navigate('Profile'))
+                if(id.username) {
+                    fetchUser(id.username)
+                    .then( () => {
+                        navigation.navigate('Profile',{
+                            screen: "Userpage"
+                        })
+                    })
+                }
               })()
             // fetchUser(ID)
             // .then((response) => {

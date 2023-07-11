@@ -103,9 +103,12 @@ const StoriesPlayUser = (props) => {
           setTimeout(() => {
             //props.navigation.goBack()
             props.navigation.navigate('Users', {
-              localId: props.route.params.host,
-              userId: props.route.params.user,
-            });
+              screen: 'Usuario',
+              params: {
+                localId: props.route.params.host,
+                userId: props.route.params.user,
+              }
+            })
           }, 10000))
     } else {
       setTimeImage(
@@ -129,9 +132,12 @@ const StoriesPlayUser = (props) => {
         .catch((e) => console.log(e));
     if (last) {
       props.navigation.navigate('Users', {
-        localId: props.route.params.host,
-        userId: props.route.params.user,
-      });
+        screen: 'Usuario',
+        params: {
+          localId: props.route.params.host,
+          userId: props.route.params.user,
+        }
+      })
       // setNextIndex(0);
       // gettime = allDisplayStory[indexDisplayStory + 1][0].duration;
       // setIndexTime(gettime);
@@ -147,9 +153,12 @@ const StoriesPlayUser = (props) => {
     clearTimeout(timeImage);
     if (last) {
       props.navigation.navigate('Users', {
-        localId: props.route.params.host,
-        userId: props.route.params.user,
-      });
+        screen: 'Usuario',
+        params: {
+          localId: props.route.params.host,
+          userId: props.route.params.user,
+        }
+      })
       // gettime = allDisplayStory[indexDisplayStory + 1][0].duration;
       // setNextIndex(0);
       // setIndexTime(gettime);
@@ -165,9 +174,12 @@ const StoriesPlayUser = (props) => {
     clearTimeout(timeImage);
     if (first) {
       props.navigation.navigate('Users', {
-        localId: props.route.params.host,
-        userId: props.route.params.user,
-      });
+        screen: 'Usuario',
+        params: {
+          localId: props.route.params.host,
+          userId: props.route.params.user,
+        }
+      })
       // gettime = allDisplayStory[indexDisplayStory - 1][0].duration;
       // setNextIndex(0);
       // setIndexTime(gettime);

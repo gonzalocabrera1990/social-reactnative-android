@@ -178,8 +178,11 @@ const Messages = ({ navigation, route, messageUpdate, commentsPost, fetchComment
                   style={styles.commentsItems}
                   onPress={() =>
                     navigation.navigate('Users', {
-                      localId: route.params.myUserId,
-                      userId: message.author._id,
+                      screen: 'Usuario',
+                      params: {
+                        localId: route.params.myUserId,
+                        userId: message.author._id
+                      } 
                     })
                   }>
                   <Image

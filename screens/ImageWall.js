@@ -74,18 +74,20 @@ const ImageWall = ({ route, navigation, user, users, commentsPost, postImageLike
     }
 
     saveId();
+
   }, [user, users, route.params]);
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        setUserState(null);
-        setIndex(null);
-        setUserpage(null);
-        setIsloading(true);
-        setId('');
-      };
-    }, [])
-  );
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     return () => {
+  //       setUserState(null);
+  //       setIndex(null);
+  //       setUserpage(null);
+  //       setIsloading(true);
+  //       setId('');
+  //     };
+  //   }, [])
+  // );
 
   const handleLike = async (imgID, tag, cb) => {
     let img = await imgID;

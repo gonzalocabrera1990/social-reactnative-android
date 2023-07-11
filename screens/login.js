@@ -78,7 +78,12 @@ class HomeScreen extends React.Component {
 
     this.props.loginUser(creds)
     .then(resp =>{
-      if(resp) this.props.navigation.navigate("Settings")
+      // if(resp) this.props.navigation.navigate("Settings")
+      if(resp){
+      this.props.navigation.navigate('Settings', {
+        screen: 'UserSettings'
+      })
+    }
     })
   };
 

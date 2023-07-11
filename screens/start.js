@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Dimensions, View, Text,
-  ScrollView, StyleSheet,
+  ScrollView, StyleSheet, RefreshControl,
   StatusBar, Image, ActivityIndicator } from 'react-native';
 
 import { connect } from 'react-redux';
@@ -25,6 +25,16 @@ const mapDispatchToProps = (dispatch) => ({
 });
 export const Start = ({ navigation, start, fetchStart }) => {
   const [content, setContent] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [colors, setColors] = useState(['white', 'yellow', 'grey']);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchStart();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 3000);
+  }, []);
   useEffect(() => {
     fetchStart();
   }, []);
@@ -56,7 +66,16 @@ export const Start = ({ navigation, start, fetchStart }) => {
     <>
     
     <StatusBar backgroundColor="#FFF" barStyle="dark-content" />
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView 
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh}
+              colors={colors} progressBackgroundColor={'#4CAF50'} 
+              progressViewOffset={100}
+            />
+          }
+        >
       <View style={styles.story}>
       <Stories navigation={navigation} style={styles.storys}/>
       </View>

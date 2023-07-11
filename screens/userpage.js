@@ -238,10 +238,13 @@ const Userpage = (props) => {
             <View key={img._id} style={styles.imgWall}>
               <TouchableHighlight
                 onPress={() =>
-                  props.navigation.navigate('ImageWall', {
-                    itemId: img._id,
-                    info: u,
-                    mediaType: 'photo'
+                  props.navigation.navigate('Profile', {
+                    screen: "ImageWall",
+                    params: {
+                      itemId: img._id,
+                      info: u,
+                      mediaType: 'photo'
+                    }
                   })
                 }
                 onLongPress={() => {
@@ -268,10 +271,13 @@ const Userpage = (props) => {
             <View key={img._id} style={styles.imgWall}>
               <TouchableHighlight
                 onPress={() =>
-                  props.navigation.navigate('ImageWall', {
-                    itemId: img._id,
-                    info: u,
-                    mediaType: 'video'
+                  props.navigation.navigate('Profile', {
+                    screen: "ImageWall",
+                    params: {
+                      itemId: img._id,
+                      info: u,
+                      mediaType: 'video'
+                    }
                   })
                 }
                 onLongPress={() => {
@@ -376,7 +382,7 @@ const Userpage = (props) => {
               <Text>
                 {u.firstname} {u.lastname}
               </Text>
-              <Text>{u.phrase}</Text>
+              <Text>"{u.phrase}"</Text>
               <View style={styles.follows}>
                 <TouchableHighlight
                   onPress={() => props.navigation.navigate('Follows', {
@@ -397,7 +403,9 @@ const Userpage = (props) => {
                 name="settings"
                 size={21}
                 color={'black'}
-                onPress={() => props.navigation.navigate('Settings')}
+                onPress={() => props.navigation.navigate('Settings', {
+                  screen: 'UserSettings'
+                })}
               />
             </View>
           </View>
@@ -554,7 +562,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
     margin: 10,
   },
   imgProfile: {
@@ -573,7 +581,7 @@ const styles = StyleSheet.create({
   },
   follows: {
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     margin: 10
